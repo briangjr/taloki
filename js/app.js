@@ -35,31 +35,35 @@ function cardHTML(c, qty){
 const graded = c => !!(c.slab && !c.slab.raw);
 function slabHTML(c){ return `<img class="slabImg" src="${c.slab.src}" alt="${c.name}, graded ${GRADE[c.grade]}">`; }
 function packHTML(p){ return `<div class="pack" style="--pk:${p.pk};--glow:${p.glow}"><div class="tearTop"></div><span class="ptint"></span><span class="gem">${p.gem}</span><span class="pname"><b>${p.name}</b><small>Astral Beasts</small></span></div>`; }
+/* ---- pack engine (per volatility style) ---- */
+const vol = () => S.vol === 'high' ? 'high' : 'normal';
 const POOLS = {};
-function bandPool(p, i){
-  const k = p.id + i;
-  return POOLS[k] || (POOLS[k] = CARDS.filter(c => !'APX'.includes(c.r) && c.value >= BANDS[i].lo * p.price && c.value < BANDS[i].hi * p.price));
+function band(p, m, i){ const [lo, hi] = MODES[m].bands[i]; return [lo * p.price, hi * p.price]; }
+function bandPool(p, m, i){
+  const k = p.id + m + i;
+  if (!POOLS[k]) { const [lo, hi] = band(p, m, i); POOLS[k] = CARDS.filter(c => !'APX'.includes(c.r) && c.value >= lo && c.value < hi); }
+  return POOLS[k];
 }
-function goldWeight(c){ return Math.pow(c.value, -GOLD_SKEW); }
-function pickGold(pool){ const tot = pool.reduce((a,c) => a + goldWeight(c), 0); let x = rand() * tot;
-  for (const c of pool) { x -= goldWeight(c); if (x < 0) return c; } return pool[pool.length - 1]; }
-function bandMean(p, i){ const pool = bandPool(p, i);
-  return i === 5 ? pool.reduce((a,c) => a + c.value * goldWeight(c), 0) / pool.reduce((a,c) => a + goldWeight(c), 0)
+const goldWeight = (c, s) => Math.pow(c.value, -s);
+function pickGold(pool, s){ const tot = pool.reduce((a,c) => a + goldWeight(c, s), 0); let x = rand() * tot;
+  for (const c of pool) { x -= goldWeight(c, s); if (x < 0) return c; } return pool[pool.length - 1]; }
+function bandMean(p, m, i){ const pool = bandPool(p, m, i), s = p[m].skew;
+  return i === 5 ? pool.reduce((a,c) => a + c.value * goldWeight(c, s), 0) / pool.reduce((a,c) => a + goldWeight(c, s), 0)
                  : pool.reduce((a,c) => a + c.value, 0) / pool.length; }
-function jackpotTotal(p){ return p.jackpot.A + p.jackpot.P + p.jackpot.X; }
-function bandRange(p, i){ const b = BANDS[i]; return i === 5 ? `${money(b.lo * p.price)}+` : `${money(b.lo * p.price)} – ${money(b.hi * p.price)}`; }
-function packStats(p){
-  let ev = 0;
-  p.odds.forEach((q, i) => { ev += (i === 5 ? q - jackpotTotal(p) : q) * bandMean(p, i); });
-  for (const r of ['A','P','X']) ev += p.jackpot[r] * avg(r);
-  return {ev, profit: p.odds.slice(2).reduce((a,b) => a + b, 0), jp: jackpotTotal(p)};
+function jackpotTotal(p, m){ const j = p[m].jackpot; return j.A + j.P + j.X; }
+function bandRange(p, m, i){ const [lo, hi] = band(p, m, i); return i === 5 ? `${money(lo)}+` : `${money(lo)} – ${money(hi)}`; }
+function packStats(p, m = vol()){
+  let ev = 0; const c = p[m];
+  c.odds.forEach((q, i) => { ev += (i === 5 ? q - jackpotTotal(p, m) : q) * bandMean(p, m, i); });
+  for (const r of ['A','P','X']) ev += c.jackpot[r] * avg(r);
+  return {ev, profit: c.odds.slice(2).reduce((a,b) => a + b, 0), jp: jackpotTotal(p, m)};
 }
-function pullFrom(p){
-  let x = rand(), i = 0, acc = 0;
-  for (; i < 5; i++) { acc += p.odds[i]; if (x < acc) break; }
-  if (i === 5) { let y = rand() * p.odds[5];
-    for (const r of ['X','P','A']) { if (y < p.jackpot[r]) return {band:5, card:pick(BY[r]), jackpot:true}; y -= p.jackpot[r]; } }
-  return {band:i, card: i === 5 ? pickGold(bandPool(p, 5)) : pick(bandPool(p, i))};
+function pullFrom(p, m = vol()){
+  const c = p[m]; let x = rand(), i = 0, acc = 0;
+  for (; i < 5; i++) { acc += c.odds[i]; if (x < acc) break; }
+  if (i === 5) { let y = rand() * c.odds[5];
+    for (const r of ['X','P','A']) { if (y < c.jackpot[r]) return {band:5, card:pick(BY[r]), jackpot:true}; y -= c.jackpot[r]; } }
+  return {band:i, card: i === 5 ? pickGold(bandPool(p, m, 5), c.skew) : pick(bandPool(p, m, i))};
 }
 const MAX_PULL = () => Math.max(...CARDS.map(c => c.value));
 const pct = x => x >= 1 ? '100%' : x === 0 ? '—' : x >= .1 ? (x*100).toFixed(0)+'%' : x >= .01 ? (x*100).toFixed(1)+'%' : x >= .001 ? (x*100).toFixed(2)+'%' : +(x*100).toPrecision(2)+'%';
@@ -68,34 +72,46 @@ const oneIn = x => x <= 0 ? '' : x >= .5 ? '' : `1 in ${Math.round(1/x).toLocale
 /* ============ RENDER ============ */
 function renderBal(){ $('#bal').textContent = money(S.bal); document.querySelectorAll('.buy[data-p]').forEach(b => b.disabled = S.bal < PACKS.find(p => p.id === b.dataset.p).price); }
 
+function volToggle(){
+  return `<div class="volT"><div class="volHead"><span>Pack style</span>
+    <div class="seg">${Object.entries(MODES).map(([k, v]) => `<button data-vol="${k}" class="${k === vol() ? 'on' : ''}">${v.name}</button>`).join('')}</div></div>
+    <p class="volDesc">${MODES[vol()].desc}</p></div>`;
+}
+function renderVol(){
+  ['#volPacks', '#volOdds'].forEach(sel => { const el = $(sel); if (el) el.innerHTML = volToggle(); });
+  document.querySelectorAll('[data-vol]').forEach(b => b.onclick = () => { S.vol = b.dataset.vol; save(); renderPacks(); renderOdds(); });
+}
 function renderPacks(){
+  renderVol();
+  const m = vol();
   $('#packList').innerHTML = PACKS.map(p => {
-    const st = packStats(p);
+    const st = packStats(p, m);
     return `<div class="packTile">${packHTML(p)}
-      <div class="packInfo"><b class="pt">${p.name}</b><div class="meta">1 card · avg value ${money(st.ev)}<br>${Math.round(st.profit*100)}% chance to profit<br>Jackpot ${oneIn(st.jp)}</div>
+      <div class="packInfo"><b class="pt">${p.name}</b><div class="meta">1 card · avg value ${money(st.ev)}<br>${Math.round(st.profit*100)}% chance to profit<br>Jackpot ${oneIn(st.jp)}${m === 'high' ? ' · <b class="hiTag">High</b>' : ''}</div>
       <button class="buy" data-p="${p.id}">Rip for ${money(p.price)}</button></div></div>`;
   }).join('');
   document.querySelectorAll('.buy[data-p]').forEach(b => b.onclick = () => openPack(b.dataset.p));
   renderBal();
 }
 
-function bandBars(p){
-  const top = Math.max(...p.odds);
-  return p.odds.map((q, i) => `<div class="bandRow"><span class="bl">${bandRange(p, i)}</span>
-    <span class="bb"><i style="width:${q/top*100}%;--c:${BANDS[i].rgb}"></i></span><span class="bp">${(q*100).toFixed(1)}%</span></div>`).join('');
+function bandBars(p, m){
+  const odds = p[m].odds, top = Math.max(...odds);
+  return odds.map((q, i) => `<div class="bandRow"><span class="bl">${bandRange(p, m, i)}</span>
+    <span class="bb"><i style="width:${Math.max(q/top*100, 1.5)}%;--c:${TIERS[i].rgb}"></i></span><span class="bp">${(q*100).toFixed(1)}%</span></div>`).join('');
 }
 function renderOdds(){
-  const maxPull = MAX_PULL();
+  renderVol();
+  const maxPull = MAX_PULL(), m = vol();
   $('#oddsList').innerHTML = PACKS.map(p => {
-    const st = packStats(p);
+    const st = packStats(p, m), j = p[m].jackpot;
     return `<div class="oddsCard"><header><b>${p.gem} ${p.name}</b><span class="meta">${money(p.price)} · 1 card · avg value ${money(st.ev)} (${Math.round(st.ev/p.price*100)}%)</span></header>
-    <div class="bands">${bandBars(p)}</div>
-    <p class="meta">Min value <strong>${money(BANDS[0].lo * p.price)}</strong> · Max pull <strong>${money(maxPull)}</strong><br>
-    Gold includes a jackpot: Ascended ${oneIn(p.jackpot.A)}, Apex ${oneIn(p.jackpot.P)}, Mythic Legend ${oneIn(p.jackpot.X)}.</p></div>`;
+    <div class="bands">${bandBars(p, m)}</div>
+    <p class="meta">Min value <strong>${money(band(p, m, 0)[0])}</strong> · Max pull <strong>${money(maxPull)}</strong><br>
+    Gold includes a jackpot: Ascended ${oneIn(j.A)}, Apex ${oneIn(j.P)}, Mythic Legend ${oneIn(j.X)}.</p></div>`;
   }).join('');
   $('#valTable').innerHTML = `<tr><th>Rarity</th><th>Cards in set</th><th>Value range</th></tr>` +
     ORDER.map(r => `<tr><td><span class="dot" style="background:var(--${r})"></span>${RAR[r].name}</td><td>${RAR[r].count}</td><td>${money(Math.min(...BY[r].map(c => c.value)))} – ${money(Math.max(...BY[r].map(c => c.value)))}</td></tr>`).join('') +
-    ['X','P','A'].map(r => `<tr><th>${RAR[r].name}</th><th>Grade</th><th>Value</th></tr>` + BY[r].map(c => `<tr><td>#${c.num} ${c.name}</td><td>${c.grade}</td><td>${money(c.value)}</td></tr>`).join('')).join('');
+    ['X','P','A'].map(r => `<tr><th>${RAR[r].name}</th><th>Grade</th><th>Value</th></tr>` + BY[r].map(c => `<tr><td>#${c.num} ${c.name}</td><td>${c.grade || 'Raw'}</td><td>${money(c.value)}</td></tr>`).join('')).join('');
 }
 
 function colValue(){ return Object.entries(S.col).reduce((a,[id,q]) => a + CARD[id].value * q, 0); }
@@ -122,12 +138,13 @@ function renderCol(){
 
 function showCard(id){
   const c = CARD[id], q = S.col[id] || 0;
-  $('#sheet').innerHTML = `${graded(c) ? slabHTML(c) : cardHTML(c)}<h3>${c.name}</h3>
+  $('#sheet').innerHTML = `${card3dHTML(c)}<div class="meta tiny">Drag to tilt · tap to flip</div><h3>${c.name}</h3>
     <div class="meta">${RAR[c.r].name} · ${c.el.name} · #${c.num}${c.grade ? ' · ' + GRADE[c.grade] : ''}${c.basic ? '<br>Basic creature' : ''}${c.stage ? `<br>Stage ${c.stage}${c.from ? ' · evolves from ' + c.from : ''}${c.into ? ' · into ' + c.into : ''}` : ''}<br>Value <strong>${money(c.value)}</strong> · You own ${q}</div>
     <div class="actions" style="justify-content:center">
       ${q ? `<button class="buy" id="sell1" style="width:auto">Sell 1 for ${money(sellPrice(c))}</button>` : ''}
       <button class="ghost" id="closeM">Close</button></div>`;
   $('#modal').classList.add('on');
+  attach3d($('#sheet .v3d'));
   $('#closeM').onclick = closeModal;
   if (q) $('#sell1').onclick = () => { sell([[id,1]]); closeModal(); };
 }
@@ -148,30 +165,66 @@ $('#sellDupes').onclick = () => sell(Object.entries(S.col).filter(([,q]) => q > 
 
 /* ============ PACK OPENING ============ */
 const RM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-let cur = null, lastPack = null;   // cur = {p, band, card, jackpot}
+let cur = null, lastPack = null;   // cur = {p, m, band, card, jackpot}
+const wait = ms => new Promise(r => setTimeout(r, RM() ? Math.min(ms, 150) : ms));
+
 function openPack(pid){
   const p = PACKS.find(x => x.id === pid);
   if (S.bal < p.price) { toast('Not enough funds. Tap + to add play money.'); return; }
   lastPack = pid;
   S.bal = Math.round((S.bal - p.price) * 100) / 100; S.spent += p.price; S.opened++;
-  cur = Object.assign({p}, pullFrom(p));
+  const m = vol();
+  cur = Object.assign({p, m}, pullFrom(p, m));
   const c = cur.card;
   S.col[c.id] = (S.col[c.id] || 0) + 1; if (!S.best || c.value > CARD[S.best].value) S.best = c.id;
   save(); renderBal();
   document.body.style.overflow = 'hidden';
-  $('#stage').classList.add('on');
+  const st = $('#stage');
+  st.className = 'stage on';
+  st.innerHTML = `<div class="stars">${Array.from({length: 90}, () =>
+    `<i style="left:${rand()*100}%;top:${rand()*100}%;--s:${(rand()*2+0.6).toFixed(1)}px;animation-delay:${(rand()*4).toFixed(2)}s"></i>`).join('')}</div><div class="sb" id="sb"></div>`;
   showChooser();
 }
+const SB = () => $('#sb');
 
-/* Step 1: scroll a looping row of 6 packs and pick one */
+/* ---- effects ---- */
+function sparks(rgb, n = 26, el, spread = 170){
+  const r = el ? el.getBoundingClientRect() : {left: innerWidth/2, top: innerHeight/2, width: 0, height: 0};
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i'); s.className = 'spark';
+    const a = rand() * Math.PI * 2, d = spread * (0.35 + rand() * 0.65);
+    s.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;--c:${rgb};animation-delay:${Math.round(rand()*90)}ms`;
+    $('#stage').appendChild(s); setTimeout(() => s.remove(), 1200);
+  }
+}
+function ring(rgb, el){
+  const r = el.getBoundingClientRect(), g = document.createElement('i'); g.className = 'ringFx';
+  g.style.cssText = `left:${r.left + r.width/2}px;top:${r.top + r.height/2}px;--c:${rgb}`;
+  $('#stage').appendChild(g); setTimeout(() => g.remove(), 1000);
+}
+function flash(r){ flashRGB({A:'25,200,230', P:'255,122,47', X:'255,215,60'}[r]); }
+function flashRGB(rgb, big){
+  const b = $('#burst');
+  b.style.background = big
+    ? 'conic-gradient(from 0deg,rgba(255,61,154,.7),rgba(255,210,31,.8),rgba(25,198,255,.7),rgba(155,77,255,.7),rgba(255,61,154,.7))'
+    : `radial-gradient(circle at 50% 45%, rgba(${rgb},.85), rgba(${rgb},0) 60%)`;
+  b.classList.remove('go'); void b.offsetWidth; b.classList.add('go');
+}
+const tierRGB = i => TIERS[i].rgb;
+
+/* ---- Step 1: scroll a looping row of 6 packs and pick one ---- */
 function showChooser(){
-  const p = cur.p, st = $('#stage'), LOOPS = 9, N = 6;
-  const serials = Array.from({length:N}, () => String(1000 + Math.floor(rand() * 9000)));
+  const p = cur.p, LOOPS = 9, N = 6;
+  const serials = Array.from({length: N}, () => String(1000 + Math.floor(rand() * 9000)));
   const items = [];
   for (let l = 0; l < LOOPS; l++) for (let k = 0; k < N; k++)
     items.push(`<div class="cItem" data-k="${k}" style="--tilt:${[-4,3,-2,4,-3,2][k]}deg">${packHTML(p)}<span class="serial">No. ${serials[k]}</span></div>`);
-  st.innerHTML = `<div class="hint">Pick your pack</div><div class="carousel" id="car">${items.join('')}</div>
-    <button class="buy pickBtn" id="pickBtn">Open this pack</button><div class="meta hintSm">Swipe to browse · tap a pack to choose it</div>`;
+  SB().innerHTML = `<button class="topX" id="cancelPick" aria-label="Close">✕</button>
+    <div class="hint">Pick your pack</div><div class="carousel" id="car">${items.join('')}</div>
+    <button class="buy pickBtn" id="pickBtn">Open this pack</button>
+    <div class="meta hintSm">${MODES[cur.m].name} style · swipe to browse · tap a pack to choose it</div>`;
+  $('#cancelPick').onclick = () => { if (confirm('Leave now? Your pack is already paid for, so its card goes straight to your collection.')) closeStage(); };
   const car = $('#car'), els = [...car.children];
   const w = () => els[1].offsetLeft - els[0].offsetLeft;
   const centerIdx = () => Math.round(car.scrollLeft / w());
@@ -182,94 +235,177 @@ function showChooser(){
   requestAnimationFrame(() => { jumpTo(N * Math.floor(LOOPS / 2)); paint(); });
   let t;
   car.addEventListener('scroll', () => { paint(); clearTimeout(t); t = setTimeout(() => {
-    const i = centerIdx();   // keep the loop endless: quietly hop back to the middle copy
-    if (i < N * 2 || i >= N * (LOOPS - 2)) { jumpTo(N * Math.floor(LOOPS / 2) + (i % N)); paint(); } }, 140); }, {passive:true});
+    const i = centerIdx();   // keeps the loop endless by hopping back to the middle copy
+    if (i < N * 2 || i >= N * (LOOPS - 2)) { jumpTo(N * Math.floor(LOOPS / 2) + (i % N)); paint(); } }, 140); }, {passive: true});
   const choose = el => { $('#pickBtn').disabled = true; el.classList.add('chosen'); setTimeout(showRip, RM() ? 0 : 380); };
   els.forEach((el, i) => el.onclick = () => {
     if (i === centerIdx()) choose(el); else car.scrollTo({left: i * w(), behavior: RM() ? 'auto' : 'smooth'}); });
   $('#pickBtn').onclick = () => choose(els[centerIdx()]);
 }
 
-/* Step 2: rip the chosen pack */
+/* ---- Step 2: rip the chosen pack ---- */
 function showRip(){
-  const st = $('#stage'), glow = cur.jackpot ? ' gold' : cur.band >= 4 ? ' fire' : cur.band >= 2 ? ' teal' : '';
-  st.innerHTML = `<div class="hint">Tap the pack to rip it</div><div class="bigpack${glow}" id="bp" tabindex="0" role="button" aria-label="Rip pack">${packHTML(cur.p)}</div>`;
+  const glow = cur.jackpot ? ' gold' : cur.band >= 4 ? ' fire' : cur.band >= 2 ? ' teal' : '';
+  SB().innerHTML = `<div class="hint">Tap the pack to rip it open</div>
+    <div class="bigpack seam${glow}" id="bp" tabindex="0" role="button" aria-label="Rip pack">${packHTML(cur.p)}<i class="streak"></i></div>`;
   const bp = $('#bp');
-  const go = () => { bp.onclick = null; bp.classList.add('ripping'); setTimeout(showSpin, RM() ? 0 : 950); };
+  const go = async () => { bp.onclick = null; bp.classList.add('ripping'); await wait(420); sparks('255,220,160', 30, bp.querySelector('.tearTop'), 150);
+    await wait(600); bp.classList.add('rise'); await wait(520); showSpin(); };
   bp.onclick = go; bp.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') go(); };
 }
 
-/* Step 3: spin through the payout tiers and land on this pack's tier */
+/* ---- Step 3: the mystery card spins and changes color until it lands on your tier ---- */
+function mysteryHTML(rgb){
+  const face = cls => `<div class="mf${cls}"><span class="mEye"><img src="images/brand/eye.webp" alt=""></span></div>`;
+  return `<div class="myst" id="myst" style="--tc:${rgb}"><div class="mIn" id="mIn">${face('')}${face(' mb')}</div></div>`;
+}
 function showSpin(){
-  const p = cur.p, st = $('#stage'), H = 68, LOOPS = 8;
-  const chips = [];
-  for (let l = 0; l < LOOPS; l++) BANDS.forEach((b, i) =>
-    chips.push(`<div class="rchip"><span style="--c:${b.rgb}" class="${i === 5 ? 'gold' : ''}"><b>${b.name}</b>${bandRange(p, i)}</span></div>`));
-  st.innerHTML = `<button class="skip" id="skip">Skip</button><div class="hint">Your card is in…</div>
-    <div class="reelWin"><div class="reel" id="reel">${chips.join('')}</div></div><div class="pulled" id="tierTxt"></div>`;
-  const target = 6 * (LOOPS - 2) + cur.band, reel = $('#reel');
-  let done = false;
-  const land = () => { if (done) return; done = true;
-    reel.style.transition = 'none'; reel.style.transform = `translateY(${-(target - 1) * H}px)`;
-    reel.children[target].classList.add('hit');
-    flashRGB(BANDS[cur.band].rgb, cur.jackpot);
-    $('#tierTxt').innerHTML = cur.jackpot ? 'JACKPOT<small>You hit the Gold lottery</small>'
-      : `${BANDS[cur.band].name} tier<small>${bandRange(p, cur.band)}</small>`;
-    setTimeout(showReveal, RM() ? 300 : cur.jackpot ? 1800 : 1100); };
-  $('#skip').onclick = () => { land(); };
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    reel.style.transition = `transform ${RM() ? 0 : cur.jackpot ? 5.2 : 3.6}s cubic-bezier(.1,.75,.15,1)`;
-    reel.style.transform = `translateY(${-(target - 1) * H}px)`;
-    setTimeout(land, RM() ? 0 : cur.jackpot ? 5300 : 3700);
-  }));
-}
-
-/* Step 4: flip the card */
-function showReveal(){
-  const c = cur.card, st = $('#stage');
-  st.innerHTML = `<button class="skip" id="skip">Skip</button>
-    <div class="revealWrap${graded(c) ? ' slabW' : ''}"><div class="flip${graded(c) ? ' slab' : ''}" id="flip" tabindex="0" role="button" aria-label="Reveal card">${graded(c) ? `<div class="back slabBack"><img src="${BACKS.slab}" alt=""></div>` : `<div class="back"></div>`}<div class="face">${graded(c) ? slabHTML(c) : cardHTML(c)}</div></div></div>
-    <div class="pulled" id="pulled"></div><div class="hint" id="h">Tap to reveal</div>`;
-  const f = $('#flip');
-  $('#skip').onclick = showResults;
-  const act = () => {
-    if (!f.classList.contains('up')) {
-      f.classList.add('up');
-      const diff = c.value - cur.p.price;
-      $('#pulled').innerHTML = `${c.name}<small>${RAR[c.r].name}${c.grade ? ' · ' + GRADE[c.grade] : ''} · ${money(c.value)}</small><small class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))} vs pack price</small>`;
-      $('#pulled').classList.toggle('x', c.r === 'X'); $('#pulled').classList.toggle('a', c.r === 'A'); $('#pulled').classList.toggle('p', c.r === 'P');
-      $('#h').textContent = 'Tap to continue';
-      if ('APX'.includes(c.r)) flash(c.r); else if (cur.band >= 3) flashRGB(BANDS[cur.band].rgb);
-    } else showResults();
+  const band = cur.band, seq = [0, 0, 0, 0];
+  for (let t = 1; t <= band; t++) seq.push(t);          // climbs one tier per half-turn
+  if (band === 0) seq.push(0, 0);
+  if (cur.jackpot) seq.push(5, 5, 'J');                  // jackpot: extra spins, then rainbow
+  const N = seq.length - 1;
+  SB().innerHTML = `<button class="skip" id="skip">Skip</button>
+    <div class="spinBox">${mysteryHTML(tierRGB(0))}</div>
+    <div class="tierLbl" id="tl"><b>${TIERS[0].name}</b><small>${bandRange(cur.p, cur.m, 0)}</small></div>
+    <div class="hint hintSm" id="spd">Tap to speed up</div>`;
+  const myst = $('#myst'), mIn = $('#mIn'), tl = $('#tl');
+  let speed = 1, t = 0, last = performance.now(), k = 0, done = false;
+  const T = RM() ? 0.2 : Math.max(2.4, 0.55 * N) * (cur.jackpot ? 1.35 : 1);
+  const setTier = x => {
+    if (x === 'J') { myst.classList.add('rainbow'); tl.innerHTML = '<b class="jp">JACKPOT</b><small>A chase card is inside</small>'; sparks('255,215,60', 40, myst, 220); return; }
+    myst.style.setProperty('--tc', tierRGB(x));
+    tl.innerHTML = `<b style="color:rgb(${tierRGB(x)})">${TIERS[x].name}</b><small>${bandRange(cur.p, cur.m, x)}</small>`;
+    if (x > 0) sparks(tierRGB(x), 14 + x * 4, myst, 150);
   };
-  f.onclick = act; f.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } };
-}
-function flash(r){ flashRGB({A:'25,200,230', P:'255,122,47', X:'255,215,60'}[r]); }
-function flashRGB(rgb, big){
-  const b = $('#burst');
-  b.style.background = big
-    ? 'conic-gradient(from 0deg,rgba(255,61,154,.7),rgba(255,210,31,.8),rgba(25,198,255,.7),rgba(155,77,255,.7),rgba(255,61,154,.7))'
-    : `radial-gradient(circle at 50% 45%, rgba(${rgb},.85), rgba(${rgb},0) 60%)`;
-  b.classList.remove('go'); void b.offsetWidth; b.classList.add('go');
+  const land = () => { if (done) return; done = true;
+    mIn.style.transform = 'rotateX(8deg) rotateY(0deg)';
+    const fin = seq[N]; if (fin !== 'J') setTier(fin); else setTier('J');
+    ring(tierRGB(band), myst); sparks(tierRGB(band), 34 + band * 6, myst, 230); flashRGB(tierRGB(band), cur.jackpot);
+    myst.classList.add('landed'); $('#spd').textContent = '';
+    setTimeout(showPeel, RM() ? 200 : cur.jackpot ? 1500 : 1000);
+  };
+  const ease = x => 1 - Math.pow(1 - x, 3);
+  const frame = now => {
+    if (done) return;
+    t += (now - last) / 1000 * speed; last = now;
+    const f = Math.min(1, t / T), ang = 180 * N * ease(f);
+    mIn.style.transform = `rotateX(8deg) rotateY(${ang}deg)`;
+    const idx = Math.min(N, Math.floor((ang + 90) / 180));
+    while (k < idx) { k++; setTier(seq[k]); }
+    if (f >= 1) land(); else requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(n => { last = n; requestAnimationFrame(frame); });
+  SB().onclick = e => { if (e.target.id === 'skip') return; speed = Math.min(speed * 2.2, 8); };
+  $('#skip').onclick = e => { e.stopPropagation(); done = true; showResults(); };
 }
 
-/* Step 5: keep, sell, or go again */
+/* ---- Step 4: peel the cover off (or tap to open) ---- */
+function faceAR(c){ return c.slab ? c.slab.ar : 5/7; }
+function frontHTML(c){ return graded(c) ? `<img class="slabImg" src="${c.slab.src}" alt="${c.name}">` : cardHTML(c); }
+function clipHalf(poly, f){
+  const out = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length], fa = f(a), fb = f(b);
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  }
+  return out;
+}
+const polyCSS = pts => pts.length >= 3 ? `polygon(${pts.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})` : 'polygon(0 0,0 0,0 0)';
+function showPeel(){
+  const c = cur.card, rgb = cur.jackpot ? '255,215,60' : tierRGB(cur.band);
+  SB().onclick = null;
+  SB().innerHTML = `<button class="skip" id="skip">Skip</button>
+    <div class="hint">${cur.jackpot ? 'Jackpot! Peel it open' : TIERS[cur.band].name + ' tier · peel it open'}</div>
+    <div class="peelWrap" id="pw" style="--ar:${faceAR(c)};--tc:${rgb}">
+      <div class="pfront" id="pfr">${frontHTML(c)}</div>
+      <div class="pcover mf${cur.jackpot ? ' rainbowBg' : ''}" id="pc"><span class="mEye"><img src="images/brand/eye.webp" alt=""></span></div>
+      <div class="pflapWrap"><div class="pflap" id="pf"></div></div>
+    </div>
+    <div class="pulled" id="pulled"></div>
+    <div class="hint hintSm" id="ph">Drag across the card to peel it · or tap to open</div>`;
+  const pw = $('#pw'), pc = $('#pc'), pf = $('#pf');
+  let L = 0, sx, sy, drag = false, moved = false, opened = false, anim;
+  const W = () => pw.clientWidth, H = () => pw.clientHeight;
+  const setPeel = l => {
+    L = l; const w = W(), h = H(), box = [[0,0],[w,0],[w,h],[0,h]];
+    const g = pt => (w - pt[0]) + pt[1] - L;             // fold line runs from the top-right corner
+    pc.style.clipPath = polyCSS(clipHalf(box, g));
+    pf.style.clipPath = polyCSS(clipHalf(box, pt => -g(pt)).map(([x, y]) => [w - L + y, L - w + x]));
+  };
+  const animateTo = (target, ms, then) => { cancelAnimationFrame(anim); const from = L, t0 = performance.now();
+    const step = now => { const f = Math.min(1, (now - t0) / (RM() ? 1 : ms)), e = 1 - Math.pow(1 - f, 3);
+      setPeel(from + (target - from) * e); if (f < 1) anim = requestAnimationFrame(step); else if (then) then(); };
+    anim = requestAnimationFrame(step); };
+  const open = () => { if (opened) return; opened = true; animateTo(W() + H() + 60, 420, revealed); };
+  pw.addEventListener('pointerdown', e => { if (opened) return; drag = true; moved = false; sx = e.clientX; sy = e.clientY; pw.setPointerCapture(e.pointerId); cancelAnimationFrame(anim); });
+  pw.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 6) moved = true; setPeel(Math.max(0, (Math.abs(dx) + Math.abs(dy)) * 0.8)); });
+  const up = () => { if (!drag) return; drag = false;
+    if (!moved) { animateTo(W() + H() + 60, 900, () => { opened = true; revealed(); }); opened = true; return; }
+    if (L > (W() + H()) * 0.33) open(); else animateTo(0, 300); };
+  pw.addEventListener('pointerup', up); pw.addEventListener('pointercancel', up);
+  $('#skip').onclick = showResults;
+  function revealed(){
+    pc.remove(); pf.parentElement.remove();
+    $('#pfr').classList.add('zap'); pw.style.setProperty('--tc', rgb);
+    ring(rgb, pw); sparks(rgb, 40, pw, 240);
+    if ('APX'.includes(c.r)) flash(c.r); else flashRGB(rgb, false);
+    const diff = c.value - cur.p.price;
+    $('#pulled').innerHTML = `${c.name}<small>${RAR[c.r].name}${c.grade ? ' · ' + GRADE[c.grade] : ''} · ${money(c.value)}</small><small class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))} vs pack price</small>`;
+    $('#pulled').classList.toggle('x', c.r === 'X'); $('#pulled').classList.toggle('a', c.r === 'A'); $('#pulled').classList.toggle('p', c.r === 'P');
+    $('#ph').textContent = 'Tap to continue';
+    setTimeout(() => { SB().onclick = showResults; }, 350);
+  }
+}
+
+/* ---- 3D card viewer: drag to tilt, tap to flip and see the back ---- */
+function card3dHTML(c){
+  const back = graded(c) ? 'images/brand/back-graded.webp' : 'images/brand/back.webp';
+  return `<div class="v3d${graded(c) ? ' isSlab' : ''}" style="--ar:${faceAR(c)}"><div class="v3dIn">
+    <div class="f3 front3">${frontHTML(c)}<i class="glare"></i></div>
+    <div class="f3 back3"><img src="${back}" alt="Card back"></div></div><i class="shadow3"></i></div>`;
+}
+function attach3d(root){
+  if (!root) return;
+  const inner = root.querySelector('.v3dIn');
+  let ry = 0, rx = 0, base = 0, sx, sy, drag = false, moved = false;
+  const set = tr => { inner.style.transition = tr || 'none'; inner.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    root.style.setProperty('--gx', `${50 + (ry - base) * 0.9}%`); };
+  root.addEventListener('pointerdown', e => { drag = true; moved = false; sx = e.clientX; sy = e.clientY; root.setPointerCapture(e.pointerId); root.classList.add('grab'); });
+  root.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 6) moved = true; ry = base + dx * 0.55; rx = Math.max(-22, Math.min(22, -dy * 0.3)); set(); });
+  const end = () => { if (!drag) return; drag = false; root.classList.remove('grab');
+    base = moved ? Math.round(ry / 180) * 180 : base + 180; ry = base; rx = 0; set('transform .65s cubic-bezier(.2,.8,.2,1)'); };
+  root.addEventListener('pointerup', end); root.addEventListener('pointercancel', end);
+}
+
+/* ---- Step 5: result screen ---- */
 function showResults(){
-  const c = cur.card, st = $('#stage'), diff = c.value - cur.p.price;
-  st.style.justifyContent = 'flex-start';
-  st.innerHTML = `<div class="results">
-    <div class="total">${money(c.value)}<small>${c.name} · ${BANDS[cur.band].name} tier · <span class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))}</span></small></div>
-    <div class="oneCard">${graded(c) ? slabHTML(c) : cardHTML(c)}</div>
-    <div class="actions">
-      <button class="buy" id="again" style="width:auto">Rip another · ${money(cur.p.price)}</button>
-      <button class="ghost" id="sellPull">Sell for ${money(sellPrice(c))}</button>
-      <button class="ghost" id="keep">Keep</button>
-    </div></div>`;
-  $('#keep').onclick = closeStage;
+  const c = cur.card, p = cur.p, diff = c.value - p.price, st = $('#stage');
+  SB().onclick = null;
+  st.classList.add('resMode');
+  SB().innerHTML = `<div class="res">
+    <div class="resTop"><button class="topX" id="closeRes" aria-label="Close">✕</button></div>
+    <div class="resCard">${card3dHTML(c)}</div>
+    <div class="resVal" id="rv">$0.00</div>
+    <div class="resName">${c.name} #${c.num}</div>
+    <div class="resTier"><span class="tchip" style="--c:${cur.jackpot ? '255,215,60' : tierRGB(cur.band)}">${cur.jackpot ? 'Jackpot' : TIERS[cur.band].name + ' tier'}</span>
+      <span class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))} vs pack</span></div>
+    <div class="meta tiny">Drag to tilt · tap the card to flip it</div>
+    <div class="resBtns"><button class="sellB" id="sellPull">Sell · ${money(sellPrice(c))}</button><button class="keepB" id="keep">Keep</button></div>
+    <button class="againB" id="again">Rip another ${p.name} · ${money(p.price)}</button>
+  </div>`;
+  attach3d($('.res .v3d'));
+  const rv = $('#rv'), t0 = performance.now(), D = RM() ? 1 : 900;
+  const count = now => { const f = Math.min(1, (now - t0) / D); rv.textContent = money(c.value * (1 - Math.pow(1 - f, 3))); if (f < 1) requestAnimationFrame(count); };
+  requestAnimationFrame(count);
+  $('#keep').onclick = $('#closeRes').onclick = closeStage;
   $('#sellPull').onclick = () => { sell([[c.id, 1]]); closeStage(); };
   $('#again').onclick = () => { closeStage(); openPack(lastPack); };
 }
-function closeStage(){ const st = $('#stage'); st.classList.remove('on'); st.style.justifyContent = ''; document.body.style.overflow = ''; renderCol(); renderBal(); }
+function closeStage(){ const st = $('#stage'); st.className = 'stage'; st.innerHTML = ''; document.body.style.overflow = ''; renderCol(); renderBal(); }
 
 /* ============ NAV + INIT ============ */
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => {
@@ -280,3 +416,17 @@ document.querySelectorAll('.nav button').forEach(b => b.onclick = () => {
 });
 $('#addFunds').onclick = () => { S.bal = Math.round((S.bal + 50) * 100) / 100; save(); renderBal(); toast('Added $50 play money'); };
 renderPacks(); renderOdds(); renderCol();
+
+/* ============ FULL-SCREEN / INSTALL ============ */
+(function(){
+  const standalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone;
+  if (standalone) { document.documentElement.classList.add('standalone'); return; }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const bar = $('#installBar');
+  const show = html => { if (S.hideInstall) return; bar.innerHTML = html + '<button class="ibClose" aria-label="Dismiss">✕</button>'; bar.hidden = false;
+    bar.querySelector('.ibClose').onclick = () => { bar.hidden = true; S.hideInstall = true; save(); }; };
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault();
+    show('<span>Install Taloki to play full screen</span><button class="ibGo">Install</button>');
+    const go = bar.querySelector('.ibGo'); if (go) go.onclick = async () => { e.prompt(); await e.userChoice; bar.hidden = true; }; });
+  if (ios) show('<span>For full screen: tap <b>Share</b> then <b>Add to Home Screen</b></span>');
+})();

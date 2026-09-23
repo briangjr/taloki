@@ -68,14 +68,23 @@ const SLABS = {
   b065: {"src": "images/cards/065-tiderock.webp", "box": [0, 0, 1, 1], "ar": 0.71514, "raw": true},
   b066: {"src": "images/cards/066-vinetail.webp", "box": [0, 0, 1, 1], "ar": 0.71344, "raw": true},
   b067: {"src": "images/cards/067-whispling.webp", "box": [0, 0, 1, 1], "ar": 0.72551, "raw": true},
-  b068: {"src": "images/cards/068-cragrip.webp", "box": [0, 0, 1, 1], "ar": 0.72376, "raw": true}
+  b068: {"src": "images/cards/068-cragrip.webp", "box": [0, 0, 1, 1], "ar": 0.72376, "raw": true},
+  b042: {"src": "images/cards/042-chronolith.webp", "box": [0, 0, 1, 1], "ar": 0.58997, "raw": true},
+  b043: {"src": "images/cards/043-tempestra.webp", "box": [0, 0, 1, 1], "ar": 0.5988, "raw": true},
+  b044: {"src": "images/cards/044-selunaris.webp", "box": [0, 0, 1, 1], "ar": 0.6424, "raw": true},
+  b045: {"src": "images/cards/045-gorgalyth.webp", "box": [0, 0, 1, 1], "ar": 0.64171, "raw": true},
+  b046: {"src": "images/cards/046-pyrelios.webp", "box": [0, 0, 1, 1], "ar": 0.64103, "raw": true},
+  b064: {"src": "images/cards/064-coralisk.webp", "box": [0, 0, 1, 1], "ar": 0.65502, "raw": true},
+  b069: {"src": "images/cards/069-stormrook.webp", "box": [0, 0, 1, 1], "ar": 0.65431, "raw": true},
+  b070: {"src": "images/cards/070-glimmerfin.webp", "box": [0, 0, 1, 1], "ar": 0.68571, "raw": true},
+  b071: {"src": "images/cards/071-shroomble.webp", "box": [0, 0, 1, 1], "ar": 0.67644, "raw": true}
 };
 
 /* ============ SET DATA ============ */
 const RAR = {
   X:{name:'Mythic Legend', count:10},
   P:{name:'Apex Rare', count:11},
-  A:{name:'Ascended Rare', count:20},
+  A:{name:'Ascended Rare', count:25},
   E:{name:'Epic',     count:10, min:2.00, max:6.00},
   R:{name:'Rare',     count:15, min:0.40, max:1.25},
   U:{name:'Uncommon', count:25, min:0.06, max:0.20},
@@ -99,6 +108,13 @@ const MYTHIC_LEGENDS = [ // [name, element, icon, value] — all graded Gem Mint
   ['Gracious',  'Light', '🌟', 30107.65], ['Montunzer', 'Stone', '⛰️', 24664.22],
   ['Velmora',   'Spirit','👻', 19116.37], ['Loz',       'Leaf',  '🍃', 15011.15],
   ['Phoenixon', 'Blaze', '🔥', 11921.87], ['Flamingopp','Blaze', '🔥', 10187.42]
+];
+const ASCENDED_BASIC = [ // #042-#046: [name, element, icon, value] — ungraded Basic Ascended Rares, priced by HP
+  ["Chronolith", "Time", "⏳", 1106.19],
+  ["Tempestra", "Aero", "🌪️", 1214.56],
+  ["Selunaris", "Cosmic", "🌙", 987.73],
+  ["Gorgalyth", "Stone", "🐍", 1329.84],
+  ["Pyrelios", "Light", "☀️", 1468.37]
 ];
 const ASCENDED = [ // [name, element, icon, grade, value] — value follows the grade
   ["Stormaryn", "Volt", "⚡", 10, 2342.86],
@@ -136,7 +152,7 @@ const APEX = [ // [name, element, icon, grade, value, evolves from] — Stage 4
   ["Pyrozarok", "Blaze", "🔥", 10, 7730.49, "Emberjaw"],
 ];
 /* Placeholder-tier values (ids 11-100), spread so every pack's payout tiers have cards in them */
-const LOW_VALUES = [0.48, 1.87, 1.34, 0.13, 1.67, 1.73, 0.79, 0.73, 0.31, 0.68, 0.3, 0.72, 1.71, 1.13, 1.23, 1.31, 1.49, 1.55, 0.3, 0.18, 0.65, 1.96, 1.55, 0.16, 0.64, 1.88, 1.43, 2.28, 1.16, 0.3, 2.45, 1.72, 0.24, 2.41, 2.23, 0.44, 2.42, 1.58, 0.57, 1.32, 2.8, 2.63, 3.34, 4.84, 7.56, 3.18, 3.79, 3.17, 2.58, 3.4, 2.58, 4.03, 4.31, 4.59, 5.64, 4.48, 6.45, 8.98, 9.47, 6.84, 2.77, 6.69, 7.87, 6.48, 6.04, 15.03, 12.62, 27.53, 22.9, 32.4, 14.31, 12.94, 25.09, 19.26, 14.18, 11.75, 14.93, 28.77, 30.71, 32.22, 199.67, 62.96, 40.07, 94.61, 77.27, 133.79, 52.99, 71.36, 56.69, 36.71];
+const LOW_VALUES = [0.18, 0.37, 1.15, 1.52, 0.37, 0.29, 0.32, 0.67, 0.75, 1.19, 2.16, 1.51, 1.79, 1.75, 0.37, 2.32, 2.42, 0.15, 0.73, 0.35, 2.16, 1.36, 2.16, 0.63, 2.41, 1.14, 0.17, 0.78, 0.32, 1.88, 0.24, 0.16, 1.18, 0.63, 0.11, 0.13, 1.27, 1.34, 0.69, 0.58, 7.51, 6.34, 7.73, 4.93, 2.95, 6.39, 2.51, 3.83, 3.55, 4.77, 2.72, 5.93, 2.46, 5.87, 8.67, 3.36, 6.53, 2.51, 2.73, 9.57, 7.88, 5.54, 8.65, 4.35, 11.49, 15.03, 12.62, 27.53, 22.9, 32.4, 14.31, 12.94, 32.22, 19.26, 14.18, 11.75, 14.93, 30.71, 25.09, 28.77, 199.67, 62.96, 40.07, 94.61, 77.27, 133.79, 52.99, 71.36, 56.69, 36.71];
 const EPICS = [ // #047-#056: [name, element, icon, evolves from, evolves into, grade or null if ungraded] — Stage 2
   ["Voltryn", "Volt", "⚡", "Sparklin", "Stormaryn", 10],
   ["Marivex", "Tide", "💧", "Aquini", "Tiderion", null],
@@ -163,6 +179,10 @@ const BASIC_RARES = [ // [card number, name, element, icon] — Basic creatures,
   [66, "Vinetail", "Leaf", "🍃"],
   [67, "Whispling", "Shade", "🏮"],
   [68, "Cragrip", "Tide", "🦀"],
+  [64, "Coralisk", "Tide", "🐉"],
+  [69, "Stormrook", "Volt", "🦅"],
+  [70, "Glimmerfin", "Tide", "🐟"],
+  [71, "Shroomble", "Leaf", "🍄"],
 ];
 const ASC_EVO = {"Stormaryn": ["Voltryn", "Thundrake"], "Tiderion": ["Marivex", "Aquarion"], "Duskara": ["Umbrix", "Knoxara"], "Terrunzer": ["Cragorn", "Montunzer"], "Emberopp": ["Rosaflare", "Flamingopp"], "Solaryn": ["Solenith", "Helioris"], "Glacivex": ["Frostlup", "Cryontra"], "Briarclaw": ["Thornkit", "Verdantor"], "Riptalon": ["Finclaw", "Leviathanis"], "Astrowl": ["Lunowl", "Celestaris"], "Mirefang": ["Marshclaw", "Bogmaw"], "Gravorn": ["Gravoltan", "Nulltusk"], "Scorpinox": ["Skorven", "Tyrannox"], "Cloudane": ["Aeralyn", "Zephyron"], "Crystara": ["Luminae", "Pristelle"]}; // Ascended (Stage 3): [evolves from, evolves into]
 const MYTH_FROM = {"Thundrake": "Stormaryn", "Aquarion": "Tiderion", "Knoxara": "Duskara", "Montunzer": "Terrunzer", "Flamingopp": "Emberopp"}; // Mythic Legends that are Stage 4
@@ -176,9 +196,11 @@ const CARDS = []; const BY = {C:[],U:[],R:[],E:[],A:[],P:[],X:[]};
     add({id:i+1, n:i+1, name, r:'X', el:{name:eln, icon}, value, grade:10, slab:SLABS['x'+(i+1)]}));
   APEX.forEach(([name, eln, icon, grade, value, evo], i) =>
     add({id:141+i, n:11+i, name, r:'P', el:{name:eln, icon}, value, grade, evo, slab:SLABS['p'+(i+1)]}));
+  ASCENDED_BASIC.forEach(([name, eln, icon, value], i) =>
+    add({id:131+i, n:42+i, name, r:'A', el:{name:eln, icon}, value, basic:true, slab:SLABS['b0'+(42+i)]}));
   ASCENDED.forEach(([name, eln, icon, grade, value], i) =>
     add({id:111+i, n:22+i, name, r:'A', el:{name:eln, icon}, value, grade, slab:SLABS['a'+(i+1)]}));
-  // placeholder tiers, printed #047 onward (#042-#046 are held for the last 5 Ascended Rares)
+  // placeholder tiers, printed #047 onward 
   const start = {E:47, R:57, U:72, C:97};
   let n = 0, id = 11;
   for (const r of ['C','U','R','E']) {
@@ -208,22 +230,38 @@ const CARDS = []; const BY = {C:[],U:[],R:[],E:[],A:[],P:[],X:[]};
 })();
 const CARD = Object.fromEntries(CARDS.map(c => [c.id, c]));
 
-/* Payout tiers, as multiples of the pack price. Blue is always a small profit; Gold also holds the jackpot. */
-const BANDS = [
-  {name:'Gray',   lo:0.10, hi:0.35, rgb:'154,163,178'},
-  {name:'Green',  lo:0.35, hi:0.95, rgb:'34,197,94'},
-  {name:'Blue',   lo:1.12, hi:1.35, rgb:'59,130,246'},
-  {name:'Purple', lo:1.35, hi:1.80, rgb:'168,85,247'},
-  {name:'Red',    lo:1.80, hi:2.60, rgb:'239,68,68'},
-  {name:'Gold',   lo:2.60, hi:Infinity, rgb:'250,204,21'}   // no ceiling: pricier cards are rarer inside Gold
+/* Payout tiers. Each volatility style sets the tier ranges, as multiples of the pack price.
+   Blue always sits a little above the pack price; Gold has no ceiling and holds the jackpot. */
+const TIERS = [
+  {name:'Gray',   rgb:'154,163,178'},
+  {name:'Green',  rgb:'34,197,94'},
+  {name:'Blue',   rgb:'59,130,246'},
+  {name:'Purple', rgb:'168,85,247'},
+  {name:'Red',    rgb:'239,68,68'},
+  {name:'Gold',   rgb:'250,204,21'}
 ];
-/* One card per pack. odds = chance of each payout tier; jackpot = chance (per pack, inside Gold) of each chase tier */
+const MODES = {
+  normal: {name:'Normal', desc:'Reliable pulls with results close to the average value of a pack.',
+           bands:[[0.10,0.35],[0.35,0.95],[1.12,1.35],[1.35,1.80],[1.80,2.60],[2.60,Infinity]]},
+  high:   {name:'High',   desc:'Wider swings with more weight on the higher tiers.',
+           bands:[[0.32,0.40],[0.40,1.00],[1.04,1.20],[1.20,1.40],[1.40,1.80],[1.80,Infinity]]}
+};
+/* One card per pack. For each style: odds = chance of each tier; jackpot = per-pack chance (inside Gold)
+   of each chase tier; skew = how steeply pricier cards get rarer inside Gold. */
 const PACKS = [
   {id:'starter', name:'Starter Pack', price:1, gem:'🌱', pk:'linear-gradient(160deg,#2FD0CE,#1FBF6A)', glow:'#1FBF6A',
-   odds:[0.427, 0.273, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/60000, P:1/300000, X:1/2000000}},
-  {id:'base',    name:'Base Pack',    price:2, gem:'💠', pk:'linear-gradient(160deg,#19C6FF,#2447F5)', glow:'#2447F5',
-   odds:[0.427, 0.273, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/30000, P:1/150000, X:1/1000000}},
-  {id:'pro',     name:'Pro Pack',     price:5, gem:'🔮', pk:'linear-gradient(160deg,#C07BFF,#6A3DFF)', glow:'#6A3DFF',
-   odds:[0.356, 0.344, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/12000, P:1/60000, X:1/400000}}
+   normal:{odds:[0.387, 0.313, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/60000, P:1/300000, X:1/2000000}, skew:1.5},
+   high:  {odds:[0.459, 0.341, 0.014, 0.017, 0.044, 0.125], jackpot:{A:1/42744, P:1/213722, X:1/1424811}, skew:3}},
+  {id:'base', name:'Base Pack', price:2, gem:'💠', pk:'linear-gradient(160deg,#19C6FF,#2447F5)', glow:'#2447F5',
+   normal:{odds:[0.369, 0.331, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/30000, P:1/150000, X:1/1000000}, skew:1.5},
+   high:  {odds:[0.459, 0.341, 0.014, 0.017, 0.044, 0.125], jackpot:{A:1/30000, P:1/150000, X:1/1000000}, skew:3.498}},
+  {id:'pro', name:'Pro Pack', price:5, gem:'🔮', pk:'linear-gradient(160deg,#C07BFF,#6A3DFF)', glow:'#6A3DFF',
+   normal:{odds:[0.246, 0.454, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/12000, P:1/60000, X:1/400000}, skew:1.5},
+   high:  {odds:[0.459, 0.341, 0.014, 0.017, 0.044, 0.125], jackpot:{A:1/7614, P:1/38071, X:1/253808}, skew:3}},
+  {id:'ultra', name:'Ultra Pack', price:10, gem:'👑', pk:'linear-gradient(160deg,#FFE066,#FF9A1A)', glow:'#FF9A1A',
+   normal:{odds:[0.365, 0.335, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/3000, P:1/15000, X:1/120000}, skew:1.5},
+   high:  {odds:[0.459, 0.341, 0.014, 0.017, 0.044, 0.125], jackpot:{A:1/3000, P:1/15000, X:1/120000}, skew:4.431}},
+  {id:'legendary', name:'Legendary Pack', price:25, gem:'🌈', pk:'linear-gradient(160deg,#FF3D9A,#9B4DFF 50%,#19C6FF)', glow:'#FF3D9A',
+   normal:{odds:[0.396, 0.304, 0.14, 0.08, 0.05, 0.03], jackpot:{A:1/1000, P:1/5000, X:1/40000}, skew:1.5},
+   high:  {odds:[0.459, 0.341, 0.014, 0.017, 0.044, 0.125], jackpot:{A:1/1000, P:1/5000, X:1/40000}, skew:4.024}}
 ];
-const GOLD_SKEW = 1.5; // inside Gold, a card's chance falls with value^1.5
