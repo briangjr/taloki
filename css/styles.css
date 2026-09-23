@@ -24,7 +24,7 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--cyan);outl
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:10px;padding:12px 16px;
   background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .logo{font-family:var(--display);font-weight:700;font-size:1.35rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.logo .eye{width:30px;height:30px;border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #2E6BFF,0 4px 12px rgba(46,107,255,.45)}
+.logo .eye{width:32px;height:32px;border-radius:9px;box-shadow:0 0 0 1.5px rgba(46,107,255,.6),0 4px 12px rgba(46,107,255,.45)}
 .wallet{margin-left:auto;display:flex;align-items:center;gap:6px}
 .bal{font-family:var(--display);font-weight:700;font-size:1.05rem;padding:7px 12px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line)}
 .add{width:36px;height:36px;border-radius:50%;background:var(--cyan);color:#062A22;font-weight:800;font-size:1.3rem;line-height:1;box-shadow:0 3px 0 #23A37C}
@@ -332,3 +332,8 @@ body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit
 .installBar span{flex:1}
 .ibGo{background:var(--cyan);color:#062A22;font-weight:800;padding:8px 12px;border-radius:10px}
 .ibClose{color:#fff;opacity:.7;padding:4px 6px}
+
+/* v3: value only after the full reveal, big and bold */
+.pulled .bigVal{display:block;font-family:var(--display);font-size:clamp(2.6rem,11vw,3.4rem);font-weight:700;line-height:1;margin-bottom:6px;color:#fff;
+  text-shadow:0 0 22px rgba(var(--tc,255,255,255),.75),0 2px 0 rgba(0,0,0,.35)}
+.resVal{font-size:clamp(3rem,13vw,3.8rem);font-weight:700;text-shadow:0 0 26px rgba(var(--vc,255,255,255),.55)}
