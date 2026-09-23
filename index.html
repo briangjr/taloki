@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taloki</title>
+<meta name="description" content="Taloki: rip packs, chase legends. A play-money trading card pack opener.">
+<meta name="theme-color" content="#0A1233">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Taloki">
+<link rel="icon" type="image/png" href="images/brand/favicon-64.png">
+<link rel="apple-touch-icon" href="images/brand/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="logo"><img class="eye" src="images/brand/eye.webp" alt="">Taloki</div>
+  <div class="wallet"><div class="bal" id="bal">$0.00</div><button class="add" id="addFunds" aria-label="Add $50 play money">+</button></div>
+</header>
+
+<main>
+  <section class="view on" id="v-packs">
+    <h1>Rip packs.<br>Chase the legends.</h1>
+    <p class="sub">Play money only. Every pack uses the published odds on the Odds tab. Keep your pulls or sell them back at 90% of card value.</p>
+    <div class="packs" id="packList"></div>
+  </section>
+
+  <section class="view" id="v-col">
+    <h1>Collection</h1>
+    <div class="statrow" id="colStats"></div>
+    <div class="actions">
+      <button class="ghost" id="sellCommons">Sell all commons &amp; uncommons</button>
+      <button class="ghost" id="sellDupes">Sell all duplicates</button>
+    </div>
+    <h2>Astral Beasts set</h2>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="colGrid"></div>
+  </section>
+
+  <section class="view" id="v-odds">
+    <h1>Odds</h1>
+    <p class="sub">Every pack gives one card. These are the chances of each payout tier, and the pack's average card value compared to its price.</p>
+    <div id="oddsList"></div>
+    <h2>Card values</h2>
+    <div class="oddsCard"><div class="tbl"><table id="valTable"></table></div></div>
+  </section>
+</main>
+
+<nav class="nav">
+  <button class="on" data-v="packs"><span>🎴</span>Packs</button>
+  <button data-v="col"><span>🗂️</span>Collection</button>
+  <button data-v="odds"><span>📊</span>Odds</button>
+</nav>
+
+<div class="stage" id="stage" aria-live="polite"></div>
+<div class="burst" id="burst"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
