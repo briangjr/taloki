@@ -369,3 +369,24 @@ body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit
 .hMain span{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hVal{font-family:var(--display)}
 .nav button{max-width:130px}
+
+/* v5: 3D viewer sizing, evolution lines */
+.v3d .f3 img,.v3d .f3 .slabImg{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
+.v3d:not(.isSlab) .f3 img{object-fit:cover}
+.sheet .v3d{width:auto;height:min(46vh,340px);max-width:78vw}
+.colSeg{margin-top:18px;width:max-content}
+.evoLine{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px;margin-top:12px}
+.evoLine.done{border-color:#E8B923;box-shadow:0 0 0 2px rgba(232,185,35,.25)}
+.evoHead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.evoHead b{font-family:var(--display);font-size:1.05rem}
+.evoHead span{font-weight:800;font-size:.85rem;color:var(--muted)}
+.evoLine.done .evoHead span{color:#C99A06}
+.evoRow{display:flex;align-items:flex-start;gap:4px}
+.evoSlot{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.evoSlot .card{--fs:.42rem;width:100%;cursor:pointer}
+.evoSlot .card.locked{cursor:default}
+.evoArrow{align-self:center;margin-top:-28px;font-style:normal;font-weight:800;color:var(--muted)}
+.evoMissing{width:100%;aspect-ratio:5/7;border:2px dashed var(--line);border-radius:10px;display:grid;place-items:center;font-size:.62rem;color:var(--muted);padding:4px}
+.evoName{font-size:.66rem;color:var(--muted);line-height:1.2}
+.evoName b{color:var(--ink);font-size:.72rem;word-break:break-word}
+.evoCard{width:100%}
