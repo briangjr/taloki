@@ -60,6 +60,10 @@ Blue is always a small profit. Every pack averages 92% of its price in both styl
 
 **Opening flow:** pick one of six looping packs → swipe across the top to cut it open → a mystery card spins and changes color up to your tier (tap to speed up) → peel the cover off by dragging, or tap to open → result screen with a 3D card you can tilt and flip, then Sell or Keep.
 
+## Evolution lines
+
+Collection → Evolutions shows every creature line (Stage 1 → 2 → 3 → 4) and which stages you own. A line turns gold when you own all four.
+
 ## Profile tab
 
 Shows balance, money added, spent on packs, earned from selling, collection value, packs opened, best pull, and a history of your last 100 pulls. Settings there can reset everything. The **+** button adds any amount of play money (up to $100,000 at a time).
@@ -74,7 +78,8 @@ Shows balance, money added, spent on packs, earned from selling, collection valu
 | 042–046 | Ascended Rare, Basic ($988–$1,468) | done |
 | 047–056 | Epic, Stage 2 ($36.71–$199.67) | done |
 | 057–071 | Rare (Stage 2 and Basic, $11.75–$32.40) | done |
-| 072–096 | Uncommon ($2.46–$11.49) | 25 still needed |
+| 072–081 | Uncommon, Stage 1 ($2.51–$7.73) | done |
+| 082–096 | Uncommon ($2.46–$11.49) | 15 still needed |
 | 097–136 | Common ($0.11–$2.42) | 40 still needed |
 
 Cards without art yet show as placeholders in packs and as face-down card backs in the collection.

@@ -39,9 +39,17 @@
       <button class="ghost" id="sellCommons">Sell all commons &amp; uncommons</button>
       <button class="ghost" id="sellDupes">Sell all duplicates</button>
     </div>
-    <h2>Astral Beasts set</h2>
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="colGrid"></div>
+    <div class="seg colSeg" id="colSeg"><button data-cv="cards" class="on">Cards</button><button data-cv="evo">Evolutions</button></div>
+    <div id="cvCards">
+      <h2>Astral Beasts set</h2>
+      <div class="chips" id="chips"></div>
+      <div class="grid" id="colGrid"></div>
+    </div>
+    <div id="cvEvo" hidden>
+      <h2>Evolution lines</h2>
+      <p class="sub" id="evoSum"></p>
+      <div id="evoList"></div>
+    </div>
   </section>
 
   <section class="view" id="v-odds">
