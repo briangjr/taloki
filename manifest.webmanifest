@@ -4,6 +4,8 @@
   "description": "Rip packs. Chase legends. Play money only.",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait",
   "background_color": "#0A1233",
   "theme_color": "#0A1233",
   "icons": [

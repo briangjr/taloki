@@ -7,6 +7,7 @@
 <meta name="description" content="Taloki: rip packs, chase legends. A play-money trading card pack opener.">
 <meta name="theme-color" content="#0A1233">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Taloki">
 <link rel="icon" type="image/png" href="images/brand/favicon-64.png">
@@ -27,6 +28,7 @@
   <section class="view on" id="v-packs">
     <h1>Rip packs.<br>Chase the legends.</h1>
     <p class="sub">Play money only. Every pack uses the published odds on the Odds tab. Keep your pulls or sell them back at 90% of card value.</p>
+    <div class="volBox" id="volPacks"></div>
     <div class="packs" id="packList"></div>
   </section>
 
@@ -45,11 +47,14 @@
   <section class="view" id="v-odds">
     <h1>Odds</h1>
     <p class="sub">Every pack gives one card. These are the chances of each payout tier, and the pack's average card value compared to its price.</p>
+    <div class="volBox" id="volOdds"></div>
     <div id="oddsList"></div>
     <h2>Card values</h2>
     <div class="oddsCard"><div class="tbl"><table id="valTable"></table></div></div>
   </section>
 </main>
+
+<div class="installBar" id="installBar" hidden></div>
 
 <nav class="nav">
   <button class="on" data-v="packs"><span>🎴</span>Packs</button>

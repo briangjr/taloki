@@ -31,22 +31,32 @@ images/cards/           card art, named <number>-<name>.webp
 
 ## How packs work
 
-Three packs, one card each: **Starter $1, Base $2, Pro $5**.
+Five packs, one card each. Every card has one fixed value; the pack decides which card you get.
 
-Every card has one fixed value. A pack rolls a payout tier, then picks a card whose value sits in that tier for that pack's price:
-
-| Tier | Value (× pack price) | Chance |
+| Pack | Price | Jackpot (Normal) |
 |---|---|---|
-| Gray | 0.10–0.35× | 43% (36% Pro) |
-| Green | 0.35–0.95× | 27% (34% Pro) |
-| Blue | 1.12–1.35× (always a small profit) | 14% |
-| Purple | 1.35–1.80× | 8% |
-| Red | 1.80–2.60× | 5% |
-| Gold | 2.60×+ (pricier cards rarer) | 3% |
+| Starter | $1 | 1 in 48,780 |
+| Base | $2 | 1 in 24,390 |
+| Pro | $5 | 1 in 9,756 |
+| Ultra | $10 | 1 in 2,449 |
+| Legendary | $25 | 1 in 816 |
 
-Gold also holds the jackpot: a small chance at an Ascended, Apex or Mythic Legend. Each pack averages 92% of its price, and selling a card back pays 90% of its value.
+The jackpot is a chance at an Ascended, Apex or Mythic Legend card, and it lives inside the Gold tier.
 
-Opening flow: pick one of six looping packs → rip it → the tier reel spins and lands → flip the card → keep, sell, or rip again.
+**Pack style (volatility)** is picked on the Packs or Odds tab and applies to every pack:
+
+| Tier | Normal: value (× price) | Normal: chance | High: value (× price) | High: chance |
+|---|---|---|---|---|
+| Gray | 0.10–0.35× | 25–40% | 0.32–0.40× | 45.9% |
+| Green | 0.35–0.95× | 30–45% | 0.40–1.00× | 34.1% |
+| Blue | 1.12–1.35× | 14% | 1.04–1.20× | 1.4% |
+| Purple | 1.35–1.80× | 8% | 1.20–1.40× | 1.7% |
+| Red | 1.80–2.60× | 5% | 1.40–1.80× | 4.4% |
+| Gold | 2.60×+ | 3% | 1.80×+ | 12.5% |
+
+Blue is always a small profit. Every pack averages 92% of its price in both styles; High just swings wider. Selling a card back pays 90% of its value. All odds are in `js/data.js`.
+
+**Opening flow:** pick one of six looping packs → rip it → a mystery card spins and changes color up to your tier (tap to speed up) → peel the cover off by dragging, or tap to open → result screen with a 3D card you can tilt and flip, then Sell or Keep.
 
 ## The set: 136 cards
 
@@ -54,16 +64,19 @@ Opening flow: pick one of six looping packs → rip it → the tier reel spins a
 |---|---|---|
 | 001–010 | Mythic Legend ($10k–$49k, graded) | done |
 | 011–021 | Apex Rare, Stage 4 ($3.4k–$9.3k by grade) | done |
-| 022–041 | Ascended Rare, Stage 3 ($450–$3k by grade) | done |
-| 042–046 | Ascended Rare | 5 still needed (Emberjaw fits here) |
-| 047–056 | Epic, Stage 2 ($36–$200) | done |
-| 057–061 | Rare, Stage 2 ($12–$32) | done |
-| 062–068 | Rare, Basic ($11.75–$19.26) | done except #064 |
-| 064, 069–071 | Rare ($25.09–$32.22) | 4 still needed |
-| 072–096 | Uncommon ($2.58–$9.47) | 25 still needed |
-| 097–136 | Common ($0.13–$2.45) | 40 still needed |
+| 022–041 | Ascended Rare, Stage 3 ($466–$2,958 by grade) | done |
+| 042–046 | Ascended Rare, Basic ($988–$1,468) | done |
+| 047–056 | Epic, Stage 2 ($36.71–$199.67) | done |
+| 057–071 | Rare (Stage 2 and Basic, $11.75–$32.40) | done |
+| 072–096 | Uncommon ($2.46–$11.49) | 25 still needed |
+| 097–136 | Common ($0.11–$2.42) | 40 still needed |
 
 Cards without art yet show as placeholders in packs and as face-down card backs in the collection.
+
+## Full screen on phones
+
+- **iPhone:** open the site in Safari, tap Share, then Add to Home Screen. It then opens full screen like an app. The site shows a reminder banner until you do this or dismiss it.
+- **Android:** Chrome offers an Install button in the banner; installed, it runs full screen.
 
 ## Notes
 
