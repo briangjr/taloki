@@ -3,7 +3,7 @@ const SELL_RATE = 0.9;
 
 /* ============ STATE ============ */
 const KEY = 'taloki-v1';
-let S = {bal:50, col:{}, spent:0, earned:0, opened:0, best:null, filter:'all'};
+let S = {bal:50, col:{}, spent:0, earned:0, opened:0, best:null, filter:'all', added:50, history:[]};
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) S = Object.assign(S, s); } catch(e) {}
 if (S.v !== 2) { for (let i = 101; i <= 110; i++) delete S.col[i]; if (S.best > 100 && S.best <= 110) S.best = null; if ('ML'.includes(S.filter)) S.filter = 'all'; S.v = 2; }
 for (const id in S.col) if (!CARD[id]) delete S.col[id];
@@ -38,10 +38,12 @@ function packHTML(p){ return `<div class="pack" style="--pk:${p.pk};--glow:${p.g
 /* ---- pack engine (per volatility style) ---- */
 const vol = () => S.vol === 'high' ? 'high' : 'normal';
 const POOLS = {};
-function band(p, m, i){ const [lo, hi] = MODES[m].bands[i]; return [lo * p.price, hi * p.price]; }
+function band(p, m, i){   // big packs set their own dollar ranges; the rest scale with price
+  if (p[m].bands) return p[m].bands[i];
+  const [lo, hi] = MODES[m].bands[i]; return [lo * p.price, hi * p.price]; }
 function bandPool(p, m, i){
   const k = p.id + m + i;
-  if (!POOLS[k]) { const [lo, hi] = band(p, m, i); POOLS[k] = CARDS.filter(c => !'APX'.includes(c.r) && c.value >= lo && c.value < hi); }
+  if (!POOLS[k]) { const [lo, hi] = band(p, m, i); POOLS[k] = CARDS.filter(c => (p[m].all || !'APX'.includes(c.r)) && c.value >= lo && c.value < hi); }
   return POOLS[k];
 }
 const goldWeight = (c, s) => Math.pow(c.value, -s);
@@ -51,7 +53,15 @@ function bandMean(p, m, i){ const pool = bandPool(p, m, i), s = p[m].skew;
   return i === 5 ? pool.reduce((a,c) => a + c.value * goldWeight(c, s), 0) / pool.reduce((a,c) => a + goldWeight(c, s), 0)
                  : pool.reduce((a,c) => a + c.value, 0) / pool.length; }
 function jackpotTotal(p, m){ const j = p[m].jackpot; return j.A + j.P + j.X; }
-function bandRange(p, m, i){ const [lo, hi] = band(p, m, i); return i === 5 ? `${money(lo)}+` : `${money(lo)} – ${money(hi)}`; }
+function bandRange(p, m, i){ const [lo, hi] = band(p, m, i); return i === 5 || hi === Infinity ? `${money(lo)}+` : `${money(lo)} – ${money(hi)}`; }
+/* chance that one pack gives an Ascended, Apex or Mythic Legend (jackpot plus any chase cards sitting in regular tiers) */
+function chaseChance(p, m = vol()){
+  const c = p[m]; let q = jackpotTotal(p, m);
+  if (c.all) c.odds.forEach((o, i) => { const pool = bandPool(p, m, i), s = c.skew;
+    const w = x => i === 5 ? goldWeight(x, s) : 1, tot = pool.reduce((a,x) => a + w(x), 0);
+    q += (i === 5 ? o - jackpotTotal(p, m) : o) * pool.filter(x => 'APX'.includes(x.r)).reduce((a,x) => a + w(x), 0) / tot; });
+  return q;
+}
 function packStats(p, m = vol()){
   let ev = 0; const c = p[m];
   c.odds.forEach((q, i) => { ev += (i === 5 ? q - jackpotTotal(p, m) : q) * bandMean(p, m, i); });
@@ -87,7 +97,7 @@ function renderPacks(){
   $('#packList').innerHTML = PACKS.map(p => {
     const st = packStats(p, m);
     return `<div class="packTile">${packHTML(p)}
-      <div class="packInfo"><b class="pt">${p.name}</b><div class="meta">1 card · avg value ${money(st.ev)}<br>${Math.round(st.profit*100)}% chance to profit<br>Jackpot ${oneIn(st.jp)}${m === 'high' ? ' · <b class="hiTag">High</b>' : ''}</div>
+      <div class="packInfo"><b class="pt">${p.name}</b><div class="meta">1 card · avg value ${money(st.ev)}<br>${Math.round(st.profit*100)}% chance to profit<br>Ascended or better ${oneIn(chaseChance(p, m))}${m === 'high' ? ' · <b class="hiTag">High</b>' : ''}</div>
       <button class="buy" data-p="${p.id}">Rip for ${money(p.price)}</button></div></div>`;
   }).join('');
   document.querySelectorAll('.buy[data-p]').forEach(b => b.onclick = () => openPack(b.dataset.p));
@@ -107,7 +117,8 @@ function renderOdds(){
     return `<div class="oddsCard"><header><b>${p.gem} ${p.name}</b><span class="meta">${money(p.price)} · 1 card · avg value ${money(st.ev)} (${Math.round(st.ev/p.price*100)}%)</span></header>
     <div class="bands">${bandBars(p, m)}</div>
     <p class="meta">Min value <strong>${money(band(p, m, 0)[0])}</strong> · Max pull <strong>${money(maxPull)}</strong><br>
-    Gold includes a jackpot: Ascended ${oneIn(j.A)}, Apex ${oneIn(j.P)}, Mythic Legend ${oneIn(j.X)}.</p></div>`;
+    ${p[m].all ? `Ascended, Apex and Mythic Legend cards sit in the upper tiers of this pack. Chance of one: ${oneIn(chaseChance(p, m)) || Math.round(chaseChance(p, m) * 100) + '%'}.`
+      : `Gold includes a jackpot: Ascended ${oneIn(j.A)}, Apex ${oneIn(j.P)}, Mythic Legend ${oneIn(j.X)}.`}</p></div>`;
   }).join('');
   $('#valTable').innerHTML = `<tr><th>Rarity</th><th>Cards in set</th><th>Value range</th></tr>` +
     ORDER.map(r => `<tr><td><span class="dot" style="background:var(--${r})"></span>${RAR[r].name}</td><td>${RAR[r].count}</td><td>${money(Math.min(...BY[r].map(c => c.value)))} – ${money(Math.max(...BY[r].map(c => c.value)))}</td></tr>`).join('') +
@@ -156,7 +167,7 @@ function sell(pairs){
   for (const [id,q] of pairs) { const have = S.col[id] || 0, k = Math.min(q, have); if (!k) continue; S.col[id] = have - k; if (!S.col[id]) delete S.col[id]; total += sellPrice(CARD[id]) * k; n += k; }
   total = Math.round(total * 100) / 100;
   if (!n) { toast('Nothing to sell'); return 0; }
-  S.bal = Math.round((S.bal + total) * 100) / 100; S.earned += total; save(); renderBal(); renderCol();
+  S.bal = Math.round((S.bal + total) * 100) / 100; S.earned += total; save(); renderBal(); renderCol(); renderProfile();
   toast(`Sold ${n} card${n>1?'s':''} for ${money(total)}`);
   return total;
 }
@@ -177,6 +188,7 @@ function openPack(pid){
   cur = Object.assign({p, m}, pullFrom(p, m));
   const c = cur.card;
   S.col[c.id] = (S.col[c.id] || 0) + 1; if (!S.best || c.value > CARD[S.best].value) S.best = c.id;
+  S.history = [{t: Date.now(), p: p.id, c: c.id, b: cur.band, m}, ...(S.history || [])].slice(0, 300);
   save(); renderBal();
   document.body.style.overflow = 'hidden';
   const st = $('#stage');
@@ -243,15 +255,28 @@ function showChooser(){
   $('#pickBtn').onclick = () => choose(els[centerIdx()]);
 }
 
-/* ---- Step 2: rip the chosen pack ---- */
+/* ---- Step 2: swipe across the top to cut the pack open ---- */
 function showRip(){
   const glow = cur.jackpot ? ' gold' : cur.band >= 4 ? ' fire' : cur.band >= 2 ? ' teal' : '';
-  SB().innerHTML = `<div class="hint">Tap the pack to rip it open</div>
-    <div class="bigpack seam${glow}" id="bp" tabindex="0" role="button" aria-label="Rip pack">${packHTML(cur.p)}<i class="streak"></i></div>`;
-  const bp = $('#bp');
-  const go = async () => { bp.onclick = null; bp.classList.add('ripping'); await wait(420); sparks('255,220,160', 30, bp.querySelector('.tearTop'), 150);
+  SB().innerHTML = `<div class="hint">Swipe across the top to cut it open</div>
+    <div class="bigpack seam${glow}" id="bp" tabindex="0" role="button" aria-label="Cut the pack open: swipe across the top, or press Enter">${packHTML(cur.p)}<i class="streak"></i>
+      <div class="cutZone" id="cz"><i class="cutGuide"></i><i class="cutLine" id="cl"></i><i class="blade" id="bl"></i><i class="ghostFinger"></i></div></div>
+    <div class="hint hintSm">Drag your finger along the dashed line</div>`;
+  const bp = $('#bp'), cz = $('#cz'), cl = $('#cl'), bl = $('#bl');
+  let sx = null, lastX = 0, done = false;
+  const go = async () => { if (done) return; done = true; cz.classList.add('cut'); cl.style.width = '100%';
+    bp.classList.add('ripping'); await wait(420); sparks('255,220,160', 30, bp.querySelector('.tearTop'), 150);
     await wait(600); bp.classList.add('rise'); await wait(520); showSpin(); };
-  bp.onclick = go; bp.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') go(); };
+  const pos = e => { const r = cz.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); };
+  cz.addEventListener('pointerdown', e => { if (done) return; sx = pos(e); lastX = sx; cz.setPointerCapture(e.pointerId); cz.classList.add('active'); });
+  cz.addEventListener('pointermove', e => { if (sx === null || done) return; lastX = pos(e);
+    const a = Math.min(sx, lastX), w = Math.abs(lastX - sx);
+    cl.style.left = a * 100 + '%'; cl.style.width = w * 100 + '%'; bl.style.left = lastX * 100 + '%';
+    if (Math.random() < 0.35) sparks('255,230,170', 2, bl, 40);
+    if (w >= 0.72) go(); });
+  const up = () => { if (done || sx === null) return; sx = null; cz.classList.remove('active'); cl.style.width = '0'; };
+  cz.addEventListener('pointerup', up); cz.addEventListener('pointercancel', up);
+  bp.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') go(); };
 }
 
 /* ---- Step 3: the mystery card spins and changes color until it lands on your tier ---- */
@@ -404,17 +429,71 @@ function showResults(){
   $('#sellPull').onclick = () => { sell([[c.id, 1]]); closeStage(); };
   $('#again').onclick = () => { closeStage(); openPack(lastPack); };
 }
-function closeStage(){ const st = $('#stage'); st.className = 'stage'; st.innerHTML = ''; document.body.style.overflow = ''; renderCol(); renderBal(); }
+function closeStage(){ const st = $('#stage'); st.className = 'stage'; st.innerHTML = ''; document.body.style.overflow = ''; renderCol(); renderBal(); renderProfile(); }
 
 /* ============ NAV + INIT ============ */
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.v));
   if (b.dataset.v === 'col') renderCol();
+  if (b.dataset.v === 'me') renderProfile();
   scrollTo(0,0);
 });
-$('#addFunds').onclick = () => { S.bal = Math.round((S.bal + 50) * 100) / 100; save(); renderBal(); toast('Added $50 play money'); };
-renderPacks(); renderOdds(); renderCol();
+/* ---- add any amount of play money ---- */
+function addMoney(v){
+  v = Math.round(v * 100) / 100;
+  if (!(v > 0) || v > 100000) { toast('Enter an amount from $0.01 to $100,000'); return false; }
+  S.bal = Math.round((S.bal + v) * 100) / 100; S.added = Math.round(((S.added || 0) + v) * 100) / 100;
+  save(); renderBal(); renderProfile(); toast(`Added ${money(v)} play money`); return true;
+}
+function openAddMoney(){
+  $('#sheet').innerHTML = `<h3>Add play money</h3>
+    <div class="amtRow"><span>$</span><input id="amt" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" aria-label="Amount"></div>
+    <div class="chipsAmt">${[10, 25, 50, 100, 500, 1000].map(v => `<button class="chip" data-a="${v}">$${v.toLocaleString('en-US')}</button>`).join('')}</div>
+    <div class="actions" style="justify-content:center;width:100%"><button class="buy" id="doAdd" style="width:auto">Add</button><button class="ghost" id="closeM">Cancel</button></div>
+    <div class="meta tiny">Play money only. Balance ${money(S.bal)}</div>`;
+  $('#modal').classList.add('on');
+  const inp = $('#amt');
+  document.querySelectorAll('.chipsAmt .chip').forEach(b => b.onclick = () => { inp.value = b.dataset.a; inp.focus(); });
+  const go = () => { const v = parseFloat(String(inp.value).replace(/[$,\s]/g, '')); if (addMoney(v)) closeModal(); };
+  $('#doAdd').onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+  $('#closeM').onclick = closeModal;
+  setTimeout(() => inp.focus(), 50);
+}
+$('#addFunds').onclick = openAddMoney;
+
+/* ---- profile / history ---- */
+function renderProfile(){
+  const el = $('#profile'); if (!el) return;
+  const best = S.best && CARD[S.best], hist = S.history || [];
+  el.innerHTML = `
+    <div class="statrow">
+      <div class="stat"><b>${money(S.bal)}</b><span>Balance</span></div>
+      <div class="stat"><b>${money(S.added || 0)}</b><span>Money added</span></div>
+      <div class="stat"><b>${money(S.spent || 0)}</b><span>Spent on packs</span></div>
+      <div class="stat"><b>${money(S.earned || 0)}</b><span>Earned from selling</span></div>
+      <div class="stat"><b>${money(colValue())}</b><span>Collection value</span></div>
+      <div class="stat"><b>${(S.opened || 0).toLocaleString('en-US')}</b><span>Packs opened</span></div>
+    </div>
+    <h2>Best pull</h2>
+    ${best ? `<div class="bestPull" data-id="${best.id}"><div class="bpCard">${cardHTML(best)}</div>
+      <div><b>${best.name}</b><div class="meta">${RAR[best.r].name} · #${best.num}</div><div class="bpVal">${money(best.value)}</div></div></div>`
+      : `<div class="empty">No pulls yet. Rip a pack!</div>`}
+    <div class="actions"><button class="buy" id="profAdd" style="width:auto">Add money</button></div>
+    <h2>Pull history</h2>
+    ${hist.length ? `<div class="histList">${hist.slice(0, 100).map(h => { const c = CARD[h.c], p = PACKS.find(x => x.id === h.p); if (!c) return '';
+      return `<div class="histRow" data-id="${c.id}"><i class="hdot" style="--c:${TIERS[h.b] ? TIERS[h.b].rgb : '154,163,178'}"></i>
+        <div class="hMain"><b>${c.name}</b><span>${p ? p.name : 'Pack'}${h.m === 'high' ? ' · High' : ''} · ${new Date(h.t).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'})}</span></div>
+        <b class="hVal">${money(c.value)}</b></div>`; }).join('')}</div>` : `<div class="empty">Your pulls will show up here.</div>`}
+    <h2>Settings</h2>
+    <div class="actions"><button class="ghost" id="resetAll">Reset balance, collection and history</button></div>`;
+  $('#profAdd').onclick = openAddMoney;
+  document.querySelectorAll('#profile [data-id]').forEach(r => r.onclick = () => { if (S.col[r.dataset.id]) showCard(+r.dataset.id); });
+  $('#resetAll').onclick = () => { if (!confirm('Reset everything? Your balance goes back to $50 and your collection and history are cleared.')) return;
+    S = {bal:50, col:{}, spent:0, earned:0, opened:0, best:null, filter:'all', added:50, history:[], vol:S.vol, hideInstall:S.hideInstall};
+    save(); renderPacks(); renderOdds(); renderCol(); renderProfile(); toast('Everything was reset'); };
+}
+renderPacks(); renderOdds(); renderCol(); renderProfile();
 
 /* ============ FULL-SCREEN / INSTALL ============ */
 (function(){
