@@ -267,7 +267,7 @@ function showSpin(){
   const N = seq.length - 1;
   SB().innerHTML = `<button class="skip" id="skip">Skip</button>
     <div class="spinBox">${mysteryHTML(tierRGB(0))}</div>
-    <div class="tierLbl" id="tl"><b>${TIERS[0].name}</b><small>${bandRange(cur.p, cur.m, 0)}</small></div>
+    <div class="tierLbl" id="tl"><b>${TIERS[0].name}</b></div>
     <div class="hint hintSm" id="spd">Tap to speed up</div>`;
   const myst = $('#myst'), mIn = $('#mIn'), tl = $('#tl');
   let speed = 1, t = 0, last = performance.now(), k = 0, done = false;
@@ -275,7 +275,7 @@ function showSpin(){
   const setTier = x => {
     if (x === 'J') { myst.classList.add('rainbow'); tl.innerHTML = '<b class="jp">JACKPOT</b><small>A chase card is inside</small>'; sparks('255,215,60', 40, myst, 220); return; }
     myst.style.setProperty('--tc', tierRGB(x));
-    tl.innerHTML = `<b style="color:rgb(${tierRGB(x)})">${TIERS[x].name}</b><small>${bandRange(cur.p, cur.m, x)}</small>`;
+    tl.innerHTML = `<b style="color:rgb(${tierRGB(x)})">${TIERS[x].name}</b>`;
     if (x > 0) sparks(tierRGB(x), 14 + x * 4, myst, 150);
   };
   const land = () => { if (done) return; done = true;
@@ -352,8 +352,8 @@ function showPeel(){
     $('#pfr').classList.add('zap'); pw.style.setProperty('--tc', rgb);
     ring(rgb, pw); sparks(rgb, 40, pw, 240);
     if ('APX'.includes(c.r)) flash(c.r); else flashRGB(rgb, false);
-    const diff = c.value - cur.p.price;
-    $('#pulled').innerHTML = `${c.name}<small>${RAR[c.r].name}${c.grade ? ' · ' + GRADE[c.grade] : ''} · ${money(c.value)}</small><small class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))} vs pack price</small>`;
+    $('#pulled').style.setProperty('--tc', rgb);
+    $('#pulled').innerHTML = `<span class="bigVal">${money(c.value)}</span>${c.name}<small>${RAR[c.r].name}${c.grade ? ' · ' + GRADE[c.grade] : ''}</small>`;
     $('#pulled').classList.toggle('x', c.r === 'X'); $('#pulled').classList.toggle('a', c.r === 'A'); $('#pulled').classList.toggle('p', c.r === 'P');
     $('#ph').textContent = 'Tap to continue';
     setTimeout(() => { SB().onclick = showResults; }, 350);
@@ -383,16 +383,15 @@ function attach3d(root){
 
 /* ---- Step 5: result screen ---- */
 function showResults(){
-  const c = cur.card, p = cur.p, diff = c.value - p.price, st = $('#stage');
+  const c = cur.card, p = cur.p, st = $('#stage');
   SB().onclick = null;
   st.classList.add('resMode');
   SB().innerHTML = `<div class="res">
     <div class="resTop"><button class="topX" id="closeRes" aria-label="Close">✕</button></div>
     <div class="resCard">${card3dHTML(c)}</div>
-    <div class="resVal" id="rv">$0.00</div>
+    <div class="resVal" id="rv" style="--vc:${cur.jackpot ? '255,215,60' : tierRGB(cur.band)}">$0.00</div>
     <div class="resName">${c.name} #${c.num}</div>
-    <div class="resTier"><span class="tchip" style="--c:${cur.jackpot ? '255,215,60' : tierRGB(cur.band)}">${cur.jackpot ? 'Jackpot' : TIERS[cur.band].name + ' tier'}</span>
-      <span class="${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : '−'}${money(Math.abs(diff))} vs pack</span></div>
+    <div class="resTier"><span class="tchip" style="--c:${cur.jackpot ? '255,215,60' : tierRGB(cur.band)}">${cur.jackpot ? 'Jackpot' : TIERS[cur.band].name + ' tier'}</span></div>
     <div class="meta tiny">Drag to tilt · tap the card to flip it</div>
     <div class="resBtns"><button class="sellB" id="sellPull">Sell · ${money(sellPrice(c))}</button><button class="keepB" id="keep">Keep</button></div>
     <button class="againB" id="again">Rip another ${p.name} · ${money(p.price)}</button>
