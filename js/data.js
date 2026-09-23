@@ -7,53 +7,53 @@ const BACKS = {slab:"images/brand/back-graded.webp"};
 const CARD_ART = {};
 /* Graded card art: one slab image per card. box = where the card sits inside the slab [left, top, width, height] as fractions */
 const SLABS = {
-  x1: {"src": "images/cards/001-thundrake.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x2: {"src": "images/cards/002-aquarion.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x3: {"src": "images/cards/003-knoxara.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x4: {"src": "images/cards/004-pleezer.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x5: {"src": "images/cards/005-gracious.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x6: {"src": "images/cards/006-montunzer.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x7: {"src": "images/cards/007-velmora.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x8: {"src": "images/cards/008-loz.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x9: {"src": "images/cards/009-phoenixon.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  x10: {"src": "images/cards/010-flamingopp.webp", "box": [0.1151, 0.1989, 0.7762, 0.7486], "ar": 0.75},
-  a1: {"src": "images/cards/022-stormaryn.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a2: {"src": "images/cards/023-tiderion.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a3: {"src": "images/cards/024-duskara.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a4: {"src": "images/cards/025-terrunzer.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a5: {"src": "images/cards/026-emberopp.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a6: {"src": "images/cards/027-frostalon.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a7: {"src": "images/cards/028-coralith.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a8: {"src": "images/cards/029-vesperyn.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a9: {"src": "images/cards/030-ironox.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a10: {"src": "images/cards/031-venomara.webp", "box": [0.1529, 0.2017, 0.6961, 0.7293], "ar": 0.75},
-  a11: {"src": "images/cards/032-solaryn.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a12: {"src": "images/cards/033-glacivex.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a13: {"src": "images/cards/034-briarclaw.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a14: {"src": "images/cards/035-riptalon.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a15: {"src": "images/cards/036-astrowl.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a16: {"src": "images/cards/037-mirefang.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a17: {"src": "images/cards/038-gravorn.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a18: {"src": "images/cards/039-scorpinox.webp", "box": [0.1586, 0.2033, 0.6809, 0.7275], "ar": 0.80029},
-  a19: {"src": "images/cards/040-cloudane.webp", "box": [0.1453, 0.2019, 0.6747, 0.729], "ar": 0.80029},
-  a20: {"src": "images/cards/041-crystara.webp", "box": [0.1586, 0.2033, 0.6738, 0.7275], "ar": 0.80029},
-  p1: {"src": "images/cards/011-helioris.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p2: {"src": "images/cards/012-cryontra.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p3: {"src": "images/cards/013-verdantor.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p4: {"src": "images/cards/014-leviathanis.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p5: {"src": "images/cards/015-celestaris.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p6: {"src": "images/cards/016-bogmaw.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p7: {"src": "images/cards/017-nulltusk.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p8: {"src": "images/cards/018-tyrannox.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p9: {"src": "images/cards/019-zephyron.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p10: {"src": "images/cards/020-pristelle.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  p11: {"src": "images/cards/021-pyrozarok.webp", "box": [0.1035, 0.2324, 0.793, 0.709], "ar": 0.66667},
-  e1: {"src": "images/cards/047-voltryn.webp", "box": [0.1156, 0.1958, 0.7754, 0.7465], "ar": 0.70758},
+  x1: {"src": "images/cards/001-thundrake.webp", "box": [0.0926, 0.1989, 0.8231, 0.7486], "ar": 0.70729},
+  x2: {"src": "images/cards/002-aquarion.webp", "box": [0.0926, 0.1981, 0.8231, 0.7494], "ar": 0.70803},
+  x3: {"src": "images/cards/003-knoxara.webp", "box": [0.0918, 0.1978, 0.8159, 0.7525], "ar": 0.71728},
+  x4: {"src": "images/cards/004-pleezer.webp", "box": [0.0906, 0.1976, 0.8182, 0.7517], "ar": 0.71444},
+  x5: {"src": "images/cards/005-gracious.webp", "box": [0.0902, 0.1976, 0.8147, 0.7517], "ar": 0.71757},
+  x6: {"src": "images/cards/006-montunzer.webp", "box": [0.0919, 0.1983, 0.8171, 0.7502], "ar": 0.71399},
+  x7: {"src": "images/cards/007-velmora.webp", "box": [0.0915, 0.1976, 0.8135, 0.7517], "ar": 0.71862},
+  x8: {"src": "images/cards/008-loz.webp", "box": [0.0913, 0.1978, 0.8243, 0.7525], "ar": 0.70995},
+  x9: {"src": "images/cards/009-phoenixon.webp", "box": [0.0918, 0.1989, 0.8159, 0.7565], "ar": 0.72105},
+  x10: {"src": "images/cards/010-flamingopp.webp", "box": [0.0921, 0.1983, 0.8182, 0.7541], "ar": 0.71668},
+  a1: {"src": "images/cards/022-stormaryn.webp", "box": [0.093, 0.2013, 0.8163, 0.7472], "ar": 0.65528},
+  a2: {"src": "images/cards/023-tiderion.webp", "box": [0.0922, 0.2015, 0.8097, 0.748], "ar": 0.66132},
+  a3: {"src": "images/cards/024-duskara.webp", "box": [0.0921, 0.2009, 0.8084, 0.7456], "ar": 0.66028},
+  a4: {"src": "images/cards/025-terrunzer.webp", "box": [0.0915, 0.2011, 0.8176, 0.7464], "ar": 0.65352},
+  a5: {"src": "images/cards/026-emberopp.webp", "box": [0.0915, 0.2013, 0.8176, 0.7472], "ar": 0.65422},
+  a6: {"src": "images/cards/027-frostalon.webp", "box": [0.0915, 0.2011, 0.8176, 0.7464], "ar": 0.65352},
+  a7: {"src": "images/cards/028-coralith.webp", "box": [0.0903, 0.2013, 0.8071, 0.7472], "ar": 0.66275},
+  a8: {"src": "images/cards/029-vesperyn.webp", "box": [0.0915, 0.2013, 0.8176, 0.7472], "ar": 0.65422},
+  a9: {"src": "images/cards/030-ironox.webp", "box": [0.0915, 0.2011, 0.8176, 0.7464], "ar": 0.65352},
+  a10: {"src": "images/cards/031-venomara.webp", "box": [0.0908, 0.202, 0.811, 0.7496], "ar": 0.66167},
+  a11: {"src": "images/cards/032-solaryn.webp", "box": [0.0898, 0.2024, 0.829, 0.7515], "ar": 0.67125},
+  a12: {"src": "images/cards/033-glacivex.webp", "box": [0.0924, 0.2004, 0.8376, 0.7439], "ar": 0.6576},
+  a13: {"src": "images/cards/034-briarclaw.webp", "box": [0.0872, 0.2029, 0.8206, 0.7533], "ar": 0.67968},
+  a14: {"src": "images/cards/035-riptalon.webp", "box": [0.0921, 0.2004, 0.8347, 0.7439], "ar": 0.65986},
+  a15: {"src": "images/cards/036-astrowl.webp", "box": [0.0935, 0.2013, 0.8318, 0.7473], "ar": 0.66515},
+  a16: {"src": "images/cards/037-mirefang.webp", "box": [0.0924, 0.2008, 0.8376, 0.7456], "ar": 0.65909},
+  a17: {"src": "images/cards/038-gravorn.webp", "box": [0.0921, 0.2013, 0.8347, 0.7473], "ar": 0.66287},
+  a18: {"src": "images/cards/039-scorpinox.webp", "box": [0.0948, 0.2039, 0.813, 0.75], "ar": 0.69072},
+  a19: {"src": "images/cards/040-cloudane.webp", "box": [0.083, 0.2024, 0.829, 0.7515], "ar": 0.67125},
+  a20: {"src": "images/cards/041-crystara.webp", "box": [0.0928, 0.2034, 0.8154, 0.7483], "ar": 0.68},
+  p1: {"src": "images/cards/011-helioris.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p2: {"src": "images/cards/012-cryontra.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p3: {"src": "images/cards/013-verdantor.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p4: {"src": "images/cards/014-leviathanis.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p5: {"src": "images/cards/015-celestaris.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p6: {"src": "images/cards/016-bogmaw.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p7: {"src": "images/cards/017-nulltusk.webp", "box": [0.0803, 0.2313, 0.8409, 0.7143], "ar": 0.6334},
+  p8: {"src": "images/cards/018-tyrannox.webp", "box": [0.0803, 0.2313, 0.8409, 0.7143], "ar": 0.6334},
+  p9: {"src": "images/cards/019-zephyron.webp", "box": [0.0803, 0.2313, 0.8409, 0.7143], "ar": 0.6334},
+  p10: {"src": "images/cards/020-pristelle.webp", "box": [0.0802, 0.2313, 0.8396, 0.7143], "ar": 0.63433},
+  p11: {"src": "images/cards/021-pyrozarok.webp", "box": [0.0803, 0.2313, 0.8409, 0.7143], "ar": 0.6334},
+  e1: {"src": "images/cards/047-voltryn.webp", "box": [0.0917, 0.1975, 0.8222, 0.7532], "ar": 0.67294},
   e2: {"src": "images/cards/048-marivex.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   e3: {"src": "images/cards/049-umbrix.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   e4: {"src": "images/cards/050-cragorn.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   e5: {"src": "images/cards/051-rosaflare.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
-  e6: {"src": "images/cards/052-solenith.webp", "box": [0.1024, 0.173, 0.7962, 0.7827], "ar": 0.70758},
+  e6: {"src": "images/cards/052-solenith.webp", "box": [0.0651, 0.173, 0.8739, 0.7827], "ar": 0.6444},
   e7: {"src": "images/cards/053-frostlup.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   e8: {"src": "images/cards/054-thornkit.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   e9: {"src": "images/cards/055-finclaw.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
@@ -62,7 +62,7 @@ const SLABS = {
   r2: {"src": "images/cards/058-gravoltan.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   r3: {"src": "images/cards/059-skorven.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
   r4: {"src": "images/cards/060-aeralyn.webp", "box": [0, 0, 1, 1], "ar": 0.70758, "raw": true},
-  r5: {"src": "images/cards/061-luminae.webp", "box": [0.0986, 0.1677, 0.8019, 0.7767], "ar": 0.70758},
+  r5: {"src": "images/cards/061-luminae.webp", "box": [0.061, 0.1677, 0.8801, 0.7767], "ar": 0.6444},
   b062: {"src": "images/cards/062-dunestag.webp", "box": [0, 0, 1, 1], "ar": 0.72029, "raw": true},
   b063: {"src": "images/cards/063-mirehop.webp", "box": [0, 0, 1, 1], "ar": 0.73082, "raw": true},
   b065: {"src": "images/cards/065-tiderock.webp", "box": [0, 0, 1, 1], "ar": 0.71514, "raw": true},
@@ -77,7 +77,17 @@ const SLABS = {
   b064: {"src": "images/cards/064-coralisk.webp", "box": [0, 0, 1, 1], "ar": 0.65502, "raw": true},
   b069: {"src": "images/cards/069-stormrook.webp", "box": [0, 0, 1, 1], "ar": 0.65431, "raw": true},
   b070: {"src": "images/cards/070-glimmerfin.webp", "box": [0, 0, 1, 1], "ar": 0.68571, "raw": true},
-  b071: {"src": "images/cards/071-shroomble.webp", "box": [0, 0, 1, 1], "ar": 0.67644, "raw": true}
+  b071: {"src": "images/cards/071-shroomble.webp", "box": [0, 0, 1, 1], "ar": 0.67644, "raw": true},
+  u072: {"src": "images/cards/072-sparklin.webp", "box": [0, 0, 1, 1], "ar": 0.6772, "raw": true},
+  u073: {"src": "images/cards/073-aquini.webp", "box": [0, 0, 1, 1], "ar": 0.6993, "raw": true},
+  u074: {"src": "images/cards/074-noxlet.webp", "box": [0, 0, 1, 1], "ar": 0.69124, "raw": true},
+  u075: {"src": "images/cards/075-pebblor.webp", "box": [0, 0, 1, 1], "ar": 0.70588, "raw": true},
+  u076: {"src": "images/cards/076-flicko.webp", "box": [0, 0, 1, 1], "ar": 0.70505, "raw": true},
+  u077: {"src": "images/cards/077-taloki-cub.webp", "box": [0, 0, 1, 1], "ar": 0.68807, "raw": true},
+  u078: {"src": "images/cards/078-chillpup.webp", "box": [0, 0, 1, 1], "ar": 0.66667, "raw": true},
+  u079: {"src": "images/cards/079-sprigpaw.webp", "box": [0, 0, 1, 1], "ar": 0.68966, "raw": true},
+  u080: {"src": "images/cards/080-ripfin.webp", "box": [0, 0, 1, 1], "ar": 0.70012, "raw": true},
+  u081: {"src": "images/cards/081-taloki-owlet.webp", "box": [0, 0, 1, 1], "ar": 0.66667, "raw": true}
 };
 
 /* ============ SET DATA ============ */
@@ -152,7 +162,7 @@ const APEX = [ // [name, element, icon, grade, value, evolves from] — Stage 4
   ["Pyrozarok", "Blaze", "🔥", 10, 7730.49, "Emberjaw"],
 ];
 /* Placeholder-tier values (ids 11-100), spread so every pack's payout tiers have cards in them */
-const LOW_VALUES = [0.18, 0.37, 1.15, 1.52, 0.37, 0.29, 0.32, 0.67, 0.75, 1.19, 2.16, 1.51, 1.79, 1.75, 0.37, 2.32, 2.42, 0.15, 0.73, 0.35, 2.16, 1.36, 2.16, 0.63, 2.41, 1.14, 0.17, 0.78, 0.32, 1.88, 0.24, 0.16, 1.18, 0.63, 0.11, 0.13, 1.27, 1.34, 0.69, 0.58, 7.51, 6.34, 7.73, 4.93, 2.95, 6.39, 2.51, 3.83, 3.55, 4.77, 2.72, 5.93, 2.46, 5.87, 8.67, 3.36, 6.53, 2.51, 2.73, 9.57, 7.88, 5.54, 8.65, 4.35, 11.49, 15.03, 12.62, 27.53, 22.9, 32.4, 14.31, 12.94, 32.22, 19.26, 14.18, 11.75, 14.93, 30.71, 25.09, 28.77, 199.67, 62.96, 40.07, 94.61, 77.27, 133.79, 52.99, 71.36, 56.69, 36.71];
+const LOW_VALUES = [0.18, 0.37, 1.15, 1.52, 0.37, 0.29, 0.32, 0.67, 0.75, 1.19, 2.16, 1.51, 1.79, 1.75, 0.37, 2.32, 2.42, 0.15, 0.73, 0.35, 2.16, 1.36, 2.16, 0.63, 2.41, 1.14, 0.17, 0.78, 0.32, 1.88, 0.24, 0.16, 1.18, 0.63, 0.11, 0.13, 1.27, 1.34, 0.69, 0.58, 4.93, 7.51, 6.34, 7.73, 2.51, 4.77, 3.83, 3.55, 6.39, 2.95, 2.72, 5.93, 2.46, 5.87, 8.67, 3.36, 6.53, 2.51, 2.73, 9.57, 7.88, 5.54, 8.65, 4.35, 11.49, 15.03, 12.62, 27.53, 22.9, 32.4, 14.31, 12.94, 32.22, 19.26, 14.18, 11.75, 14.93, 30.71, 25.09, 28.77, 199.67, 62.96, 40.07, 94.61, 77.27, 133.79, 52.99, 71.36, 56.69, 36.71];
 const EPICS = [ // #047-#056: [name, element, icon, evolves from, evolves into, grade or null if ungraded] — Stage 2
   ["Voltryn", "Volt", "⚡", "Sparklin", "Stormaryn", 10],
   ["Marivex", "Tide", "💧", "Aquini", "Tiderion", null],
@@ -183,6 +193,18 @@ const BASIC_RARES = [ // [card number, name, element, icon] — Basic creatures,
   [69, "Stormrook", "Volt", "🦅"],
   [70, "Glimmerfin", "Tide", "🐟"],
   [71, "Shroomble", "Leaf", "🍄"],
+];
+const STAGE1 = [ // [card number, name, element, icon, evolves into] — Stage 1 Uncommons
+  [72, "Sparklin", "Volt", "⚡", "Voltryn"],
+  [73, "Aquini", "Tide", "💧", "Marivex"],
+  [74, "Noxlet", "Shade", "🌙", "Umbrix"],
+  [75, "Pebblor", "Stone", "⛰️", "Cragorn"],
+  [76, "Flicko", "Blaze", "🔥", "Rosaflare"],
+  [77, "Taloki", "Light", "☀️", "Solenith"],
+  [78, "Chillpup", "Frost", "❄️", "Frostlup"],
+  [79, "Sprigpaw", "Leaf", "🍃", "Thornkit"],
+  [80, "Ripfin", "Tide", "💧", "Finclaw"],
+  [81, "Taloki", "Shade", "🌙", "Lunowl"],
 ];
 const ASC_EVO = {"Stormaryn": ["Voltryn", "Thundrake"], "Tiderion": ["Marivex", "Aquarion"], "Duskara": ["Umbrix", "Knoxara"], "Terrunzer": ["Cragorn", "Montunzer"], "Emberopp": ["Rosaflare", "Flamingopp"], "Solaryn": ["Solenith", "Helioris"], "Glacivex": ["Frostlup", "Cryontra"], "Briarclaw": ["Thornkit", "Verdantor"], "Riptalon": ["Finclaw", "Leviathanis"], "Astrowl": ["Lunowl", "Celestaris"], "Mirefang": ["Marshclaw", "Bogmaw"], "Gravorn": ["Gravoltan", "Nulltusk"], "Scorpinox": ["Skorven", "Tyrannox"], "Cloudane": ["Aeralyn", "Zephyron"], "Crystara": ["Luminae", "Pristelle"]}; // Ascended (Stage 3): [evolves from, evolves into]
 const MYTH_FROM = {"Thundrake": "Stormaryn", "Aquarion": "Tiderion", "Knoxara": "Duskara", "Montunzer": "Terrunzer", "Flamingopp": "Emberopp"}; // Mythic Legends that are Stage 4
@@ -222,6 +244,9 @@ const CARDS = []; const BY = {C:[],U:[],R:[],E:[],A:[],P:[],X:[]};
   });
   BASIC_RARES.forEach(([n, name, eln, icon]) => {
     const c = BY.R[n - 57]; Object.assign(c, {name, el:{name:eln, icon}, basic:true, slab:SLABS['b' + String(n).padStart(3,'0')]});
+  });
+  STAGE1.forEach(([n, name, eln, icon, into]) => {
+    const c = BY.U[n - 72]; Object.assign(c, {name, el:{name:eln, icon}, stage:1, into, slab:SLABS['u' + String(n).padStart(3,'0')]});
   });
   BY.A.forEach(c => { const e = ASC_EVO[c.name]; if (e) Object.assign(c, {stage:3, from:e[0], into:e[1]}); });
   BY.P.forEach(c => Object.assign(c, {stage:4, from:c.evo}));

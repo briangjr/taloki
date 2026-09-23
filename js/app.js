@@ -126,7 +126,45 @@ function renderOdds(){
 }
 
 function colValue(){ return Object.entries(S.col).reduce((a,[id,q]) => a + CARD[id].value * q, 0); }
+/* ---- evolution lines: Stage 1 → 2 → 3 → 4 ---- */
+function evoLines(){
+  const find = f => CARDS.find(f);
+  const lines = [];
+  BY.A.filter(a => a.stage === 3).forEach(a => {
+    const s2 = find(c => c.stage === 2 && c.name === a.from);
+    const s1 = find(c => c.stage === 1 && c.into === a.from);
+    const s4 = find(c => c.stage === 4 && c.name === a.into);
+    lines.push([{c: s1, name: s1 ? s1.name : (s2 && s2.from) || 'Unknown'}, {c: s2, name: a.from}, {c: a, name: a.name}, {c: s4, name: a.into}]);
+  });
+  // Stage 4 cards whose earlier stages aren't in the set yet
+  CARDS.filter(c => c.stage === 4 && !BY.A.some(a => a.into === c.name))
+    .forEach(c => lines.push([{name: 'Unknown'}, {name: 'Unknown'}, {name: c.from}, {c, name: c.name}]));
+  return lines;
+}
+function renderEvo(){
+  const lines = evoLines().map(l => ({l, have: l.filter(s => s.c && S.col[s.c.id] > 0).length}));
+  lines.sort((a, b) => b.have - a.have);
+  const done = lines.filter(x => x.have === 4).length;
+  $('#evoSum').textContent = `${done} of ${lines.length} lines complete. Own all four stages of a creature to complete its line.`;
+  $('#evoList').innerHTML = lines.map(({l, have}) => `<div class="evoLine${have === 4 ? ' done' : ''}">
+    <div class="evoHead"><b>${l[3].name} line</b><span>${have === 4 ? '✓ Complete' : have + ' / 4'}</span></div>
+    <div class="evoRow">${l.map((s, i) => `${i ? '<i class="evoArrow">›</i>' : ''}<div class="evoSlot">
+      ${s.c && S.col[s.c.id] > 0 ? `<div class="evoCard" data-id="${s.c.id}">${cardHTML(s.c)}</div>`
+        : s.c ? `<div class="card locked"><div class="in">#${s.c.num}</div></div>`
+        : `<div class="evoMissing">Not in the set yet</div>`}
+      <span class="evoName">Stage ${i + 1}<br><b>${s.name}</b></span></div>`).join('')}</div></div>`).join('');
+  document.querySelectorAll('#evoList .evoCard').forEach(el => el.onclick = () => showCard(+el.dataset.id));
+}
+function setColView(v){
+  S.colView = v; save();
+  document.querySelectorAll('#colSeg button').forEach(b => b.classList.toggle('on', b.dataset.cv === v));
+  $('#cvCards').hidden = v !== 'cards'; $('#cvEvo').hidden = v !== 'evo';
+  if (v === 'evo') renderEvo();
+}
+document.querySelectorAll('#colSeg button').forEach(b => b.onclick = () => setColView(b.dataset.cv));
+
 function renderCol(){
+  if (S.colView === 'evo') { setColView('evo'); }
   const owned = Object.keys(S.col).filter(id => S.col[id] > 0).length;
   $('#colStats').innerHTML = `
     <div class="stat"><b>${owned}/${CARDS.length}</b><span>Set complete</span><div class="bar"><i style="width:${owned/CARDS.length*100}%"></i></div></div>
