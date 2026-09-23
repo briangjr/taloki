@@ -33,15 +33,17 @@ images/cards/           card art, named <number>-<name>.webp
 
 Five packs, one card each. Every card has one fixed value; the pack decides which card you get.
 
-| Pack | Price | Jackpot (Normal) |
+| Pack | Price | Ascended or better (Normal) |
 |---|---|---|
 | Starter | $1 | 1 in 48,780 |
 | Base | $2 | 1 in 24,390 |
 | Pro | $5 | 1 in 9,756 |
 | Ultra | $10 | 1 in 2,449 |
 | Legendary | $25 | 1 in 816 |
+| Mythic | $100 | 1 in 37 |
+| Sovereign | $500 | about 1 in 2 |
 
-The jackpot is a chance at an Ascended, Apex or Mythic Legend card, and it lives inside the Gold tier.
+For the $1–$25 packs, the jackpot is a chance at an Ascended, Apex or Mythic Legend card and lives inside the Gold tier. The $100 and $500 packs cost enough that those cards sit in their regular tiers, so those two packs use their own dollar ranges (see `js/data.js`).
 
 **Pack style (volatility)** is picked on the Packs or Odds tab and applies to every pack:
 
@@ -56,7 +58,11 @@ The jackpot is a chance at an Ascended, Apex or Mythic Legend card, and it lives
 
 Blue is always a small profit. Every pack averages 92% of its price in both styles; High just swings wider. Selling a card back pays 90% of its value. All odds are in `js/data.js`.
 
-**Opening flow:** pick one of six looping packs → rip it → a mystery card spins and changes color up to your tier (tap to speed up) → peel the cover off by dragging, or tap to open → result screen with a 3D card you can tilt and flip, then Sell or Keep.
+**Opening flow:** pick one of six looping packs → swipe across the top to cut it open → a mystery card spins and changes color up to your tier (tap to speed up) → peel the cover off by dragging, or tap to open → result screen with a 3D card you can tilt and flip, then Sell or Keep.
+
+## Profile tab
+
+Shows balance, money added, spent on packs, earned from selling, collection value, packs opened, best pull, and a history of your last 100 pulls. Settings there can reset everything. The **+** button adds any amount of play money (up to $100,000 at a time).
 
 ## The set: 136 cards
 
