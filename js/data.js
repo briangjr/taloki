@@ -293,11 +293,11 @@ const PACKS = [
   {id:'mythic', name:'Mythic Pack', price:100, gem:'💎', pk:'linear-gradient(160deg,#F7D774,#8A5A12 55%,#1A1206)', glow:'#E8B923',
    normal:{odds:[0.3301, 0.5029, 0.14, 0.02, 0.006, 0.001], jackpot:{A:0, P:0, X:0}, skew:1.5, all:true,
             bands:[[10,35],[35,95],[105,200],[450,1000],[1000,3000],[3000,Infinity]]},
-   high:  {odds:[0.4864, 0.4636, 0.02, 0.012, 0.012, 0.006], jackpot:{A:0, P:0, X:0}, skew:1, all:true,
-            bands:[[10,35],[35,95],[105,200],[450,700],[700,1500],[1500,Infinity]]}},
+   high:  {odds:[0.262, 0.6699, 0.017, 0.031, 0.0075, 0.0126], jackpot:{A:0, P:0, X:0}, skew:1.2, all:true,
+            bands:[[30,40],[40,100],[105,140],[150,200],[450,700],[700,Infinity]]}},
   {id:'sovereign', name:'Sovereign Pack', price:500, gem:'👁️', pk:'linear-gradient(160deg,#6FF0FF,#2E5BFF 45%,#05081A)', glow:'#3FD6A5',
    normal:{odds:[0.5626, 0.1674, 0.16, 0.07, 0.03, 0.01], jackpot:{A:0, P:0, X:0}, skew:1.5, all:true,
             bands:[[36,200],[200,500],[520,720],[980,1500],[1500,3000],[3000,Infinity]]},
-   high:  {odds:[0.7317, 0.1183, 0.03, 0.03, 0.04, 0.05], jackpot:{A:0, P:0, X:0}, skew:1.2, all:true,
-            bands:[[36,200],[400,500],[520,720],[980,1300],[1300,1600],[1900,Infinity]]}}
+   high:  {odds:[0.262, 0.5931, 0.017, 0.031, 0.057, 0.0399], jackpot:{A:0, P:0, X:0}, skew:2, all:true,
+            bands:[[100,200],[200,500],[500,550],[550,650],[650,900],[900,Infinity]]}}
 ];
