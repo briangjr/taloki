@@ -77,6 +77,7 @@ Cards without art yet show as placeholders in packs and as face-down card backs 
 
 - **iPhone:** open the site in Safari, tap Share, then Add to Home Screen. It then opens full screen like an app. The site shows a reminder banner until you do this or dismiss it.
 - **Android:** Chrome offers an Install button in the banner; installed, it runs full screen.
+- The home-screen icon is the Taloki eye (`images/brand/app-icon-*.png`). Phones cache icons, so if Taloki was added before this icon existed, delete it from the home screen and add it again.
 
 ## Notes
 

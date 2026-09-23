@@ -4,12 +4,31 @@
   "description": "Rip packs. Chase legends. Play money only.",
   "start_url": "/",
   "display": "standalone",
-  "display_override": ["fullscreen", "standalone"],
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
   "orientation": "portrait",
-  "background_color": "#0A1233",
+  "background_color": "#000000",
   "theme_color": "#0A1233",
   "icons": [
-    { "src": "images/brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "images/brand/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "images/brand/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/brand/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/brand/app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
